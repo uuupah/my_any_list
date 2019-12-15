@@ -1,0 +1,4 @@
+design database
+design basic funcionality (working with dummy data)
+integrate database and basic functionality
+implement database updates from within app

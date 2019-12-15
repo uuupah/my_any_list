@@ -1,0 +1,36 @@
+ui
+
+media selection activity
+	allows users to pick the type of media they want to browse
+	eg. books, movies, games
+	checkbox to set selected media as default; app will automatically load this media on next start
+title selection activity
+	allows users to pick specific title they want to check
+	eg. a new hope, the empire strikes back, return of the jedi
+	should have filtering options - list and grouped
+	list - alphabetical, score, date
+	grouped - planning, watching, completed
+title detail activity
+	shows a fullwidth image of the media, the title, creator, description and other important information
+new title / title edit activity
+	contains the same information forms as the title detail screen but is modifiable by the user
+	existing information is prefilled if the user is modifying an existing title
+sidebar activity
+	swiping from the right gives users prompts to go to the settings activity and other navigation
+settings activity
+	standard android style settings page, sorted under sub headers if necessary
+
+
+settings
+
+user can switch between light, dark and amoled visual styles
+	(?) colored visual styles
+	(?) custom colored styles
+scores in 5 star vs 10/10
+multiple user support accessing multiple databases
+ 
+ux
+
+user can log into a cloud service to sync their database with other platforms
+new media types should be able to be made by the user. users create the title groups (planning, watching, complete, etc.) and the data shown for each title (actors, publisher, location). for each title some defaults will be required (name, creator/author, date, score, description) but the header name for creator/author will be modifiable by the user.
+
