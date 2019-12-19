@@ -1,14 +1,17 @@
 package com.example.android.myanylist;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+
+import static androidx.recyclerview.widget.DividerItemDecoration.HORIZONTAL;
+import static java.security.AccessController.getContext;
 
 public class MediaActivity extends AppCompatActivity {
 
@@ -20,7 +23,7 @@ public class MediaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_media);
 
         Log.d(TAG, "onCreate: started.");
 
