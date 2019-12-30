@@ -1,28 +1,21 @@
-package com.example.android.myanylist;
+// Media.java
+// this class is used to bundle the name and description of a media type together for use in the
 
-// class to bundle name and icon together for media menu
+package com.example.android.myanylist;
 
 public class Media {
 
-    private static final int NO_IMAGE_PROVIDED = -1;
-
     private String mName;                                           // name of the media type
-    private int mImageResourceId = NO_IMAGE_PROVIDED;               // material icon for media type
+    private String mDesc;                                           // description of the media type
 
-    public Media(String Name, int ImageResourceId) {                // constructor
+    public Media(String Name, String Desc) {                        // constructor
         mName = Name;
-        mImageResourceId = ImageResourceId;
+        mDesc = Desc;
     }
 
     public String getName() {
         return mName;
     }
 
-    public int getImageResourceId() {
-        return mImageResourceId;
-    }
-
-    public boolean hasImage() {
-        return mImageResourceId != NO_IMAGE_PROVIDED;
-    }
+    public String getDesc() { return mDesc; }
 }

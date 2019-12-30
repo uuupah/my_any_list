@@ -1,7 +1,10 @@
+// MediaActivity.java
+// contains all the behaviour for the main activity that allows users to select between different media types
+// should create the database if it does not exist
+
 package com.example.android.myanylist;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -9,9 +12,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.util.ArrayList;
-
-import static androidx.recyclerview.widget.DividerItemDecoration.HORIZONTAL;
-import static java.security.AccessController.getContext;
 
 public class MediaActivity extends AppCompatActivity {
 
@@ -27,23 +27,23 @@ public class MediaActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: started.");
 
-        initImageBitmaps();
+        initContents();
         initMediaRecyclerView();
     }
 
-    private void initImageBitmaps(){
+    private void initContents(){
         Log.d(TAG, "initImageBitmaps: preparing bitmaps");
 
-        mMediaTypes.add(new Media("Film", R.drawable.baseline_movie_black_48));
-        mMediaTypes.add(new Media("Books", R.drawable.baseline_book_black_48));
-        mMediaTypes.add(new Media("Video Games", R.drawable.baseline_videogame_asset_black_48));
+        mMediaTypes.add(new Media("Film", "film desc"));
+        mMediaTypes.add(new Media("Books", "books desc"));
+        mMediaTypes.add(new Media("Video Games", "video games desc"));
 
     }
 
     private void initMediaRecyclerView(){
         Log.d(TAG, "initMediaRecyclerView: init media recycler view.");
         RecyclerView mediaRecyclerView = findViewById(R.id.media_recycler_view);
-        MediaRecyclerViewAdapter adapter = new MediaRecyclerViewAdapter(this, mMediaTypes); // update this when adapter supports Media objects
+        MediaRecyclerViewAdapter adapter = new MediaRecyclerViewAdapter(this, mMediaTypes);
 
         mediaRecyclerView.setAdapter(adapter);
         mediaRecyclerView.setLayoutManager(new LinearLayoutManager(this));

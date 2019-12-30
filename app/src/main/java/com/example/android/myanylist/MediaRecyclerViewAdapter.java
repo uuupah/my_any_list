@@ -1,3 +1,6 @@
+// MediaRecyclerViewAdapter.java
+// adapts the recycler view for media types on the media activity
+
 package com.example.android.myanylist;
 
 import android.content.Context;
@@ -5,7 +8,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,9 +15,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.ArrayList;
+
+// =================================================================================================
 
 public class MediaRecyclerViewAdapter extends RecyclerView.Adapter<MediaRecyclerViewAdapter
         .ViewHolder> {
@@ -26,6 +28,7 @@ public class MediaRecyclerViewAdapter extends RecyclerView.Adapter<MediaRecycler
     private ArrayList<Media> mMediaArrayList = new ArrayList<>();                                   // list of Media elements
     private Context mContext;
 
+// =================================================================================================
 
     public MediaRecyclerViewAdapter(Context context, ArrayList<Media> media) {                      // constructor
         mMediaArrayList = media;
@@ -47,12 +50,7 @@ public class MediaRecyclerViewAdapter extends RecyclerView.Adapter<MediaRecycler
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: called.");                                               // log every time a view holder is bound
 
-//        Glide.with(mContext) // grabs the image from position and places it in the view holder
-//                .asBitmap()
-//                .load(mImages.get(position))
-//                .into(holder.image);
-
-        holder.image.setImageResource(mMediaArrayList.get(position).getImageResourceId());          // update the media resources in the current view holder
+        holder.desc.setText(mMediaArrayList.get(position).getDesc());          // update the media resources in the current view holder
         holder.name.setText(mMediaArrayList.get(position).getName());
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {                         // create on click listener for view, currently displays a toast
@@ -75,13 +73,12 @@ public class MediaRecyclerViewAdapter extends RecyclerView.Adapter<MediaRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder {                                       // acts as a package for easy reference to the views of the list
 
-        ImageView image;
-        TextView name;
+        TextView name, desc;
         RelativeLayout parentLayout;
 
         public ViewHolder(@NonNull View itemView) {                                                 // constructor
             super(itemView);
-            image = itemView.findViewById(R.id.media_image);
+            desc = itemView.findViewById(R.id.media_desc);
             name = itemView.findViewById(R.id.media_name);
             parentLayout = itemView.findViewById(R.id.media_recycler_parent);
         }
