@@ -27,6 +27,7 @@ public class MediaActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: started.");
 
+        //TODO replace init contents with a task that creates a template database if it does not exist
         initContents();
         initMediaRecyclerView();
     }
@@ -40,6 +41,7 @@ public class MediaActivity extends AppCompatActivity {
 
     }
 
+    //TODO modify function to read from database instead of array
     private void initMediaRecyclerView(){
         Log.d(TAG, "initMediaRecyclerView: init media recycler view.");
         RecyclerView mediaRecyclerView = findViewById(R.id.media_recycler_view);
