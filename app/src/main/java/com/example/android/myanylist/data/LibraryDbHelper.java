@@ -19,6 +19,7 @@ public class LibraryDbHelper extends SQLiteOpenHelper {
         String SQL_CREATE_MEDIA_TABLE = "CREATE TABLE " + MediaListContract.MediaEntry.TABLE_NAME + " ("
                 + MediaListContract.MediaEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + MediaListContract.MediaEntry.COLUMN_MEDIA_NAME + " TEXT NOT NULL, "
+                + MediaListContract.MediaEntry.COLUMN_MEDIA_DESC + " TEXT NOT NULL, "
                 + MediaListContract.MediaEntry.COLUMN_CREATOR_TYPE + " INTEGER NOT NULL DEFAULT 0);";
 
         db.execSQL(SQL_CREATE_MEDIA_TABLE);

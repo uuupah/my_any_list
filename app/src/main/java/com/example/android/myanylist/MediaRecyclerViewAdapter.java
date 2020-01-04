@@ -14,21 +14,22 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView.Adapter;
 
 import java.util.ArrayList;
 
 // =================================================================================================
 
-public class MediaRecyclerViewAdapter extends RecyclerView.Adapter<MediaRecyclerViewAdapter
+public class MediaRecyclerViewAdapter extends Adapter<MediaRecyclerViewAdapter
         .ViewHolder> {
+
+    //TODO modify functionality so constructors read in and use a cursor / database
 
     private static final String TAG = "MediaRecyclerViewAdapter";                                   // error tag
 
 //    private ArrayList<String> mStringArray = new ArrayList<>();                                   // why is it redundant below but not here?
     private ArrayList<Media> mMediaArrayList = new ArrayList<>();                                   // list of Media elements
     private Context mContext;
-
-// =================================================================================================
 
     public MediaRecyclerViewAdapter(Context context, ArrayList<Media> media) {                      // constructor
         mMediaArrayList = media;
@@ -50,7 +51,7 @@ public class MediaRecyclerViewAdapter extends RecyclerView.Adapter<MediaRecycler
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         Log.d(TAG, "onBindViewHolder: called.");                                               // log every time a view holder is bound
 
-        holder.desc.setText(mMediaArrayList.get(position).getDesc());          // update the media resources in the current view holder
+        holder.desc.setText(mMediaArrayList.get(position).getDesc());                               // update the media resources in the current view holder
         holder.name.setText(mMediaArrayList.get(position).getName());
 
         holder.parentLayout.setOnClickListener(new View.OnClickListener() {                         // create on click listener for view, currently displays a toast

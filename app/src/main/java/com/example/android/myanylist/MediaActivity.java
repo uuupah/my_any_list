@@ -27,18 +27,22 @@ public class MediaActivity extends AppCompatActivity {
 
         Log.d(TAG, "onCreate: started.");
 
-        //TODO replace init contents with a task that creates a template database if it does not exist
-        initContents();
+        resetMediaList();
         initMediaRecyclerView();
     }
 
-    private void initContents(){
-        Log.d(TAG, "initImageBitmaps: preparing bitmaps");
+    private void resetMediaList(){
+        Log.d(TAG, "resetMediaList: ");
 
         mMediaTypes.add(new Media("Film", "film desc"));
         mMediaTypes.add(new Media("Books", "books desc"));
         mMediaTypes.add(new Media("Video Games", "video games desc"));
 
+        //TODO setup database creation
+        // for testing purposes just:
+        // delete existing database
+        // create and fill new database
+        // for later testing check if a non-empty database exists and only create/fill if it doesn't
     }
 
     //TODO modify function to read from database instead of array

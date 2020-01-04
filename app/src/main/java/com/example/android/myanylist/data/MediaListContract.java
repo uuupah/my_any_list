@@ -26,8 +26,9 @@ public final class MediaListContract {
 
         // columns
         public static final String _ID = BaseColumns._ID;
-        public static final String COLUMN_MEDIA_NAME = "Name";
-        public static final String COLUMN_CREATOR_TYPE = "Creator_type";
+        public static final String COLUMN_MEDIA_NAME = "name";
+        public static final String COLUMN_MEDIA_DESC = "description";
+        public static final String COLUMN_CREATOR_TYPE = "creator_type";
 
         // creator type enum
         public static final int CREATOR_CREATOR = 0;

@@ -15,7 +15,6 @@ import androidx.annotation.Nullable;
 import com.example.android.myanylist.data.MediaListContract.MediaEntry;
 
 public class LibraryProvider extends ContentProvider {
-    //TODO create content provider for media activity
 
     public static final String LOG_TAG = LibraryProvider.class.getSimpleName();
     private LibraryDbHelper mDbHelper; // database helper object
