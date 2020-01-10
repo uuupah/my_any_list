@@ -5,4 +5,6 @@
     <color name="colorPrimaryLight">#4a6572</color>
     <color name="colorAccent">#f9aa33</color>
 
+    <color name="listItemBackground">#ffffff</color>
+    <color name="transparent">#00000000</color>
 </resources>
