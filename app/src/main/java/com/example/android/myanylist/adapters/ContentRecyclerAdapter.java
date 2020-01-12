@@ -34,7 +34,7 @@ public class ContentRecyclerAdapter extends RecyclerView.Adapter<ContentRecycler
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.date.setText(mItems.get(position).getDateAdded());
         holder.title.setText(mItems.get(position).getTitle());
-        holder.status.setText(mItems.get(position).getTitle());
+        holder.status.setText(ContentItem.getStringStatus(mItems.get(position).getStatus()));
         holder.image.setImageResource(mItems.get(position).getImage());
     }
 
