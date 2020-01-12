@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">myanylist</string>
+    <string name="status">Status</string>
+    <string name="date_added">Date Added</string>
+    <string name="date_created">Date Created</string>
+    <string name="creator">Created By</string>
+
 </resources>

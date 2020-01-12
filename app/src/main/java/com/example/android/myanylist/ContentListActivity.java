@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.LinearLayout;
 
 import com.example.android.myanylist.adapters.ContentRecyclerAdapter;
 import com.example.android.myanylist.models.ContentItem;
@@ -36,7 +35,7 @@ public class ContentListActivity extends AppCompatActivity implements ContentRec
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.content_list_toolbar);
         setSupportActionBar(toolbar);
-         setTitle("Games");
+        setTitle("Games");
         toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
 
     }
@@ -61,8 +60,9 @@ public class ContentListActivity extends AppCompatActivity implements ContentRec
     @Override
     public void onContentClick(int position) {
         mContent.get(position);
-        Intent intent = new Intent(this, /** activity **/);
-        startActivity(/**activity**/);
+        Intent intent = new Intent(this, ContentActivity.class);
+        intent.putExtra("selected_content", mContent.get(position));
+        startActivity(intent);
 
     }
 }

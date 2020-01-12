@@ -1,6 +1,11 @@
 package com.example.android.myanylist.models;
 
-public class ContentItem {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.example.android.myanylist.R;
+
+public class ContentItem implements Parcelable {
     // vars
     private String title;                   // the title of the piece of media
     private int score;                      // the score out of ten (shown as half stars out of five)
@@ -25,7 +30,37 @@ public class ContentItem {
 
     // empty constructor
     public ContentItem(){
+        this.title = "title";
+        this.score = 0;
         this.dateAdded = "01012020";        // as above
+        this.dateCreated = "01011970";
+        this.status = 0;
+        this.creator = "creator";
+        this.description = "description";
+        this.image = R.mipmap.ic_launcher;
+    };
+
+    protected ContentItem(Parcel in) {
+        title = in.readString();
+        score = in.readInt();
+        dateAdded = in.readString();
+        dateCreated = in.readString();
+        status = in.readInt();
+        creator = in.readString();
+        description = in.readString();
+        image = in.readInt();
+    }
+
+    public static final Creator<ContentItem> CREATOR = new Creator<ContentItem>() {
+        @Override
+        public ContentItem createFromParcel(Parcel in) {
+            return new ContentItem(in);
+        }
+
+        @Override
+        public ContentItem[] newArray(int size) {
+            return new ContentItem[size];
+        }
     };
 
     // tostring method
@@ -82,5 +117,22 @@ public class ContentItem {
             default:
                 return "Invalid status";
         }
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(title);
+        dest.writeInt(score);
+        dest.writeString(dateAdded);
+        dest.writeString(dateCreated);
+        dest.writeInt(status);
+        dest.writeString(creator);
+        dest.writeString(description);
+        dest.writeInt(image);
     }
 }
