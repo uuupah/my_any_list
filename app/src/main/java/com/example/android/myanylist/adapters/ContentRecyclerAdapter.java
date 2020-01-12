@@ -16,17 +16,19 @@ import java.util.ArrayList;
 
 public class ContentRecyclerAdapter extends RecyclerView.Adapter<ContentRecyclerAdapter.ViewHolder> {
 
-    ArrayList<ContentItem> mItems = new ArrayList<>();
+    private ArrayList<ContentItem> mItems = new ArrayList<>();
+    private OnContentListener mOnContentListener;
 
-    public ContentRecyclerAdapter(ArrayList<ContentItem> items) {
+    public ContentRecyclerAdapter(ArrayList<ContentItem> items, OnContentListener onContentListener) {
         this.mItems = items;
+        this.mOnContentListener = onContentListener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_content_list_item, parent, false);
-        return new ViewHolder(view);
+        return new ViewHolder(view, mOnContentListener);
     }
 
     // fills contents of view depending on current position in database
@@ -43,16 +45,31 @@ public class ContentRecyclerAdapter extends RecyclerView.Adapter<ContentRecycler
         return mItems.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView title, status, date;
         private ImageView image;
 
-        public ViewHolder(@NonNull View itemView) {
+        OnContentListener onContentListener;
+
+        public ViewHolder(@NonNull View itemView, OnContentListener onContentListener) {
             super(itemView);
             date = itemView.findViewById(R.id.content_list_item_date_added);
             title = itemView.findViewById(R.id.content_list_item_title);
             status = itemView.findViewById(R.id.content_list_item_status);
             image = itemView.findViewById(R.id.content_list_item_image);
+
+            this.onContentListener = onContentListener;
+
+            itemView.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            onContentListener.onContentClick(getAdapterPosition());
+        }
+    }
+
+    public interface OnContentListener {
+        void onContentClick(int position);
     }
 }

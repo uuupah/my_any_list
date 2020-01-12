@@ -1,9 +1,11 @@
 package com.example.android.myanylist;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
 
@@ -13,7 +15,7 @@ import com.example.android.myanylist.util.VerticalSpacingItemDecorator;
 
 import java.util.ArrayList;
 
-public class ContentListActivity extends AppCompatActivity {
+public class ContentListActivity extends AppCompatActivity implements ContentRecyclerAdapter.OnContentListener{
 
     // ui components
     private RecyclerView            mRecyclerView;
@@ -31,6 +33,12 @@ public class ContentListActivity extends AppCompatActivity {
 
         initRecyclerView();
         insertFakeContent();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.content_list_toolbar);
+        setSupportActionBar(toolbar);
+         setTitle("Games");
+        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
+
     }
 
     private void insertFakeContent() {
@@ -45,9 +53,16 @@ public class ContentListActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(linearLayoutManager);
         VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(16);
         mRecyclerView.addItemDecoration(itemDecorator);
-        mContentRecyclerAdapater = new ContentRecyclerAdapter(mContent);
+        mContentRecyclerAdapater = new ContentRecyclerAdapter(mContent, this);
         mRecyclerView.setAdapter(mContentRecyclerAdapater);
     }
 
 
+    @Override
+    public void onContentClick(int position) {
+        mContent.get(position);
+        Intent intent = new Intent(this, /** activity **/);
+        startActivity(/**activity**/);
+
+    }
 }
