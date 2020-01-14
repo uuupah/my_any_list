@@ -15,9 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
-            app:layout_scrollFlags="scroll|enterAlways"
-            tools:title="Sekiro: Shadows Die Twice"
-            app:titleTextColor="@android:color/white">
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <include layout="@layout/layout_view_toolbar"/>
 
@@ -44,6 +42,17 @@
                 tools:src="@drawable/sekiro" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:paddingTop="8dp"
+                android:paddingRight="8dp"
+                android:text="@string/title"
+                android:textColor="@color/textGrey"
+                android:textSize="16sp"
+                android:visibility="gone"/>
+
+            <EditText
                 android:id="@+id/view_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,9 +61,23 @@
                 android:paddingTop="8dp"
                 android:paddingRight="8dp"
                 android:textSize="34sp"
+                android:textColor="@color/textGrey"
+                android:background="@color/transparent"
+                android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="Sekiro: Shadows Die Twice" />
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:paddingTop="8dp"
+                android:paddingRight="8dp"
+                android:text="@string/description"
+                android:textColor="@color/textGrey"
+                android:textSize="16sp"
+                android:visibility="gone"/>
+
+            <EditText
                 android:id="@+id/view_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -62,7 +85,10 @@
                 android:paddingTop="8dp"
                 android:paddingRight="16dp"
                 android:textSize="14sp"
-                tools:text="Carve your own clever path to vengeance in the critically acclaimed adventure from developer FromSoftware, creators of Bloodborne and the Dark Souls series. In Sekiro: Shadows Die Twice you are the one-armed wolf, a disgraced and disfigured warrior rescued from the brink of death. Bound to protect a young lord who is the descendant of an ancient bloodline, you become the target of many vicious enemies, including the dangerous Ashina clan. When the young lord is captured, nothing will stop you on a perilous quest to regain your honor, not even death itself. Explore late 1500s Sengoku Japan, a brutal period of constant life and death conflict, as you come face to face with larger than life foes in a dark and twisted world. Unleash an arsenal of deadly prosthetic tools and powerful ninja abilities while you blend stealth, vertical traversal, and visceral head to head combat in a bloody confrontation. Take Revenge. Restore your honor. Kill Ingeniously." />
+                android:textColor="@color/textGrey"
+                android:background="@color/transparent"
+                android:inputType="textMultiLine|textNoSuggestions"
+                tools:text="In Sekiro: Shadows Die Twice you are the one-armed wolf, a disgraced and disfigured warrior rescued from the brink of death. Bound to protect a young lord who is the descendant of an ancient bloodline, you become the target of many vicious enemies, including the dangerous Ashina clan." />
 
             <TextView
                 android:layout_width="match_parent"
@@ -71,9 +97,10 @@
                 android:paddingTop="8dp"
                 android:paddingRight="8dp"
                 android:text="@string/status"
+                android:textColor="@color/textGrey"
                 android:textSize="16sp" />
 
-            <TextView
+            <EditText
                 android:id="@+id/view_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -81,6 +108,9 @@
                 android:paddingTop="8dp"
                 android:paddingRight="16dp"
                 android:textSize="14sp"
+                android:textColor="@color/textGrey"
+                android:background="@color/transparent"
+                android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="Planned" />
 
             <TextView
@@ -89,10 +119,11 @@
                 android:paddingLeft="8dp"
                 android:paddingTop="8dp"
                 android:paddingRight="8dp"
+                android:textColor="@color/textGrey"
                 android:text="@string/creator"
                 android:textSize="16sp" />
 
-            <TextView
+            <EditText
                 android:id="@+id/view_creator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -100,6 +131,9 @@
                 android:paddingTop="8dp"
                 android:paddingRight="16dp"
                 android:textSize="14sp"
+                android:textColor="@color/textGrey"
+                android:background="@color/transparent"
+                android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="FromSoftware" />
 
             <TextView
@@ -109,9 +143,10 @@
                 android:paddingTop="8dp"
                 android:paddingRight="8dp"
                 android:text="@string/date_created"
+                android:textColor="@color/textGrey"
                 android:textSize="16sp" />
 
-            <TextView
+            <EditText
                 android:id="@+id/view_date_created"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -119,6 +154,9 @@
                 android:paddingTop="8dp"
                 android:paddingRight="16dp"
                 android:textSize="14sp"
+                android:textColor="@color/textGrey"
+                android:background="@color/transparent"
+                android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="22 March 2019" />
 
             <ImageView

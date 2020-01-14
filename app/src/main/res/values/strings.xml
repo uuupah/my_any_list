@@ -4,5 +4,7 @@
     <string name="date_added">Date Added</string>
     <string name="date_created">Date Created</string>
     <string name="creator">Created By</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
 
 </resources>

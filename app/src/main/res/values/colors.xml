@@ -7,4 +7,5 @@
 
     <color name="listItemBackground">#ffffff</color>
     <color name="transparent">#00000000</color>
+    <color name="textGrey">#424242</color>
 </resources>
