@@ -26,11 +26,12 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:importantForAutofill="no">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
             >
 
@@ -62,7 +63,7 @@
                 android:paddingRight="8dp"
                 android:textSize="34sp"
                 android:textColor="@color/textGrey"
-                android:background="@color/transparent"
+                android:backgroundTint="@color/transparent"
                 android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="Sekiro: Shadows Die Twice" />
 
@@ -86,7 +87,7 @@
                 android:paddingRight="16dp"
                 android:textSize="14sp"
                 android:textColor="@color/textGrey"
-                android:background="@color/transparent"
+                android:backgroundTint="@color/transparent"
                 android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="In Sekiro: Shadows Die Twice you are the one-armed wolf, a disgraced and disfigured warrior rescued from the brink of death. Bound to protect a young lord who is the descendant of an ancient bloodline, you become the target of many vicious enemies, including the dangerous Ashina clan." />
 
@@ -109,7 +110,7 @@
                 android:paddingRight="16dp"
                 android:textSize="14sp"
                 android:textColor="@color/textGrey"
-                android:background="@color/transparent"
+                android:backgroundTint="@color/transparent"
                 android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="Planned" />
 
@@ -132,7 +133,7 @@
                 android:paddingRight="16dp"
                 android:textSize="14sp"
                 android:textColor="@color/textGrey"
-                android:background="@color/transparent"
+                android:backgroundTint="@color/transparent"
                 android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="FromSoftware" />
 
@@ -155,7 +156,7 @@
                 android:paddingRight="16dp"
                 android:textSize="14sp"
                 android:textColor="@color/textGrey"
-                android:background="@color/transparent"
+                android:backgroundTint="@color/transparent"
                 android:inputType="textMultiLine|textNoSuggestions"
                 tools:text="22 March 2019" />
 
@@ -173,5 +174,14 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/content_fab"
+        android:layout_gravity="end|bottom"
+        android:src="@drawable/ic_create_black_24dp"
+        android:layout_margin="16dp"
+        app:fabSize="auto"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
