@@ -1,2 +1,2 @@
 # myanylist
-a modular/customisable media tracking app for android
+a customisable media tracking app for android
