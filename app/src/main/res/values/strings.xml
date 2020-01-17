@@ -7,4 +7,10 @@
     <string name="title">Title</string>
     <string name="description">Description</string>
 
+    <string-array name="status">
+        <item>Planning</item>
+        <item>In Progress</item>
+        <item>Completed</item>
+        <item>Dropped</item>
+    </string-array>
 </resources>

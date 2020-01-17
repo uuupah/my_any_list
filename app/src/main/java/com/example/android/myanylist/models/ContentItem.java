@@ -1,11 +1,15 @@
 package com.example.android.myanylist.models;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import com.example.android.myanylist.R;
 
 public class ContentItem implements Parcelable {
+    private static final String TAG = "ContentItem";
+
     // vars
     private String title;                   // the title of the piece of media
     private int score;                      // the score out of ten (shown as half stars out of five)
@@ -115,10 +119,28 @@ public class ContentItem implements Parcelable {
             case STATUS_DROPPED:
                 return "Dropped";
             default:
+                Log.e(TAG, "getStringStatus: invalid status");
                 return "Invalid status";
         }
     }
 
+    public static int getStatusColor (int i) {
+        switch (i) {
+            case STATUS_PLANNING:
+                return R.color.status_planning_yellow;
+            case STATUS_IN_PROGRESS:
+                return R.color.status_in_progress_blue;
+            case STATUS_COMPLETED:
+                return R.color.status_completed_green;
+            case STATUS_DROPPED:
+                return R.color.status_dropped_red;
+            default:
+                Log.e(TAG, "getStatusColor: invalid status");
+                return R.color.textGrey;
+        }
+    }
+
+    //parcelable methods
     @Override
     public int describeContents() {
         return 0;

@@ -8,4 +8,9 @@
     <color name="listItemBackground">#ffffff</color>
     <color name="transparent">#00000000</color>
     <color name="textGrey">#424242</color>
+    
+    <color name="status_planning_yellow">#f1c40f</color>
+    <color name="status_in_progress_blue">#3498db</color>
+    <color name="status_completed_green">#2ecc71</color>
+    <color name="status_dropped_red">#e74c3c</color>
 </resources>

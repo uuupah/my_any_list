@@ -11,15 +11,18 @@ import android.renderscript.ScriptGroup;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.myanylist.models.ContentItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class ContentActivity extends AppCompatActivity implements View.OnClickListener {
+public class ContentActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "ContentActivity";
     private static final int EDIT_MODE_ENABLED = 1;
@@ -28,9 +31,10 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     // ui components
     private ImageView mImageView;
     private ImageButton mBackView, mCheckView;
-    private TextView mTitleHeader, mDescriptionHeader;
-    private EditText mViewTitle, mViewDescription, mViewStatus, mViewCreator, mViewDateCreated;
+    private TextView mTitleHeader, mDescriptionHeader, mViewStatus;
+    private EditText mViewTitle, mViewDescription, mViewCreator, mViewDateCreated;
     private FloatingActionButton mFab;
+    private Spinner mSpinnerStatus;
 
     // vars
     private static ContentItem mInitialContent;
@@ -66,9 +70,11 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void initialiseViews(){
+        // toolbar buttons
         mBackView = findViewById(R.id.view_back_button);
         mCheckView = findViewById(R.id.view_check_button);
 
+        // headers that are shown during edit mode
         mTitleHeader = findViewById(R.id.view_title_header);
         mDescriptionHeader = findViewById(R.id.view_description_header);
 
@@ -80,6 +86,16 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mFab = findViewById(R.id.content_fab);
 
         mImageView = findViewById(R.id.view_image);
+
+        //set up spinner
+        mSpinnerStatus = findViewById(R.id.view_status_spinner);
+        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(this, R.array.status, android.R.layout.simple_spinner_item);
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerStatus.setAdapter(statusAdapter);
+        mSpinnerStatus.setOnItemSelectedListener(this);
+
+        // update status color
+        mViewStatus.setTextColor(getResources().getColor(R.color.status_planning_yellow)); // assuming that planning is the default value
     }
 
     private void setListeners(){
@@ -108,6 +124,8 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mCheckView.setVisibility(View.VISIBLE);
         mTitleHeader.setVisibility(View.VISIBLE);
         mDescriptionHeader.setVisibility(View.VISIBLE);
+        mSpinnerStatus.setVisibility(View.VISIBLE);
+        mViewStatus.setVisibility(View.GONE);
 
         mMode = EDIT_MODE_ENABLED;
 
@@ -124,18 +142,20 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mCheckView.setVisibility(View.GONE);
         mTitleHeader.setVisibility(View.GONE);
         mDescriptionHeader.setVisibility(View.GONE);
+        mSpinnerStatus.setVisibility(View.GONE);
+        mViewStatus.setVisibility(View.VISIBLE);
 
         mMode = EDIT_MODE_DISABLED;
 
         mFab.show();
 
         disableContentInteraction(); // probably unnecessary
+
     }
 
     private void disableContentInteraction(){
         disableEditText(mViewTitle);
         disableEditText(mViewDescription);
-        disableEditText(mViewStatus);
         disableEditText(mViewCreator);
         disableEditText(mViewDateCreated);
     }
@@ -151,7 +171,6 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     private void enableContentInteraction(){
         enableEditText(mViewTitle);
         enableEditText(mViewDescription);
-        enableEditText(mViewStatus);
         enableEditText(mViewCreator);
         enableEditText(mViewDateCreated);
     }
@@ -176,11 +195,13 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mTitle = mInitialContent.getTitle();
         mDescription = mInitialContent.getDescription();
         mStatus = ContentItem.getStringStatus(mInitialContent.getStatus());
+        mStatusInt = mInitialContent.getStatus();
         mCreator = mInitialContent.getCreator();
         mDateCreated = mInitialContent.getDateCreated();
         mImageRes = mInitialContent.getImage();
 
         fillViews();
+
     }
 
     private void initialiseContent() {
@@ -202,6 +223,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mViewCreator.setText(mCreator);
         mViewDateCreated.setText(mDateCreated);
         mImageView.setImageResource(mImageRes);
+        mViewStatus.setTextColor(getResources().getColor(ContentItem.getStatusColor(mStatusInt)));
     }
 
     private void displayEditTextUnderline() {
@@ -258,5 +280,20 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         if(mMode == EDIT_MODE_ENABLED){
             enableEditMode();
         }
+    }
+
+    // methods for handling spinner
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        mStatusInt = position;
+        mStatus = ContentItem.getStringStatus(position);
+        mViewStatus.setText(mStatus);
+        mViewStatus.setTextColor(getResources().getColor(ContentItem.getStatusColor(mStatusInt)));
+        Log.d(TAG, "onItemSelected: changed color to " + ContentItem.getStatusColor(mStatusInt));
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }

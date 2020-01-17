@@ -104,7 +104,7 @@
                 android:textColor="@color/textGrey"
                 android:textSize="16sp" />
 
-            <EditText
+            <TextView
                 android:id="@+id/view_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -115,8 +115,20 @@
                 android:paddingTop="8dp"
                 android:paddingRight="16dp"
                 android:textColor="@color/textGrey"
+                android:textStyle="bold"
                 android:textSize="14sp"
-                tools:text="Planned" />
+                tools:text="Planned"
+                android:visibility="visible"/>
+
+            <Spinner
+                android:id="@+id/view_status_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="16dp"
+                android:paddingTop="8dp"
+                android:paddingRight="16dp"
+                android:spinnerMode="dropdown"
+                android:visibility="gone"/>
 
             <TextView
                 android:layout_width="match_parent"
