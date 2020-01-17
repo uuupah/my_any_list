@@ -10,16 +10,16 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.myanylist.R;
-import com.example.android.myanylist.models.ContentItem;
+import com.example.android.myanylist.models.MediaEntry;
 
 import java.util.ArrayList;
 
 public class ContentRecyclerAdapter extends RecyclerView.Adapter<ContentRecyclerAdapter.ViewHolder> {
 
-    private ArrayList<ContentItem> mItems = new ArrayList<>();
+    private ArrayList<MediaEntry> mItems = new ArrayList<>();
     private OnContentListener mOnContentListener;
 
-    public ContentRecyclerAdapter(ArrayList<ContentItem> items, OnContentListener onContentListener) {
+    public ContentRecyclerAdapter(ArrayList<MediaEntry> items, OnContentListener onContentListener) {
         this.mItems = items;
         this.mOnContentListener = onContentListener;
     }
@@ -36,7 +36,7 @@ public class ContentRecyclerAdapter extends RecyclerView.Adapter<ContentRecycler
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.date.setText(mItems.get(position).getDateAdded());
         holder.title.setText(mItems.get(position).getTitle());
-        holder.status.setText(ContentItem.getStringStatus(mItems.get(position).getStatus()));
+        holder.status.setText(MediaEntry.getStringStatus(mItems.get(position).getStatus()));
         holder.image.setImageResource(mItems.get(position).getImage());
     }
 

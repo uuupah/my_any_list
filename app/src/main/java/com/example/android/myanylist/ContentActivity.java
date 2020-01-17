@@ -7,7 +7,6 @@ import androidx.appcompat.widget.Toolbar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.renderscript.ScriptGroup;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -19,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.example.android.myanylist.models.ContentItem;
+import com.example.android.myanylist.models.MediaEntry;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ContentActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -37,7 +36,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mSpinnerStatus;
 
     // vars
-    private static ContentItem mInitialContent;
+    private static MediaEntry mInitialContent;
     private boolean mIsNewEntry;
     private String mTitle, mDescription, mStatus, mCreator, mDateCreated;
     private int mImageRes, mStatusInt, mMode;
@@ -194,7 +193,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     private void readContent() {
         mTitle = mInitialContent.getTitle();
         mDescription = mInitialContent.getDescription();
-        mStatus = ContentItem.getStringStatus(mInitialContent.getStatus());
+        mStatus = MediaEntry.getStringStatus(mInitialContent.getStatus());
         mStatusInt = mInitialContent.getStatus();
         mCreator = mInitialContent.getCreator();
         mDateCreated = mInitialContent.getDateCreated();
@@ -208,7 +207,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mTitle = "New Entry";
         mDescription = "Describe the entry here.";
         mStatusInt = 0;
-        mStatus = ContentItem.getStringStatus(mStatusInt);
+        mStatus = MediaEntry.getStringStatus(mStatusInt);
 //        creator = "Creator";
 //        dateCreated = "01 Jan 1970";
         mImageRes = R.mipmap.ic_launcher; // temporary image
@@ -223,7 +222,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mViewCreator.setText(mCreator);
         mViewDateCreated.setText(mDateCreated);
         mImageView.setImageResource(mImageRes);
-        mViewStatus.setTextColor(getResources().getColor(ContentItem.getStatusColor(mStatusInt)));
+        mViewStatus.setTextColor(getResources().getColor(MediaEntry.getStatusColor(mStatusInt)));
     }
 
     private void displayEditTextUnderline() {
@@ -286,10 +285,10 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         mStatusInt = position;
-        mStatus = ContentItem.getStringStatus(position);
+        mStatus = MediaEntry.getStringStatus(position);
         mViewStatus.setText(mStatus);
-        mViewStatus.setTextColor(getResources().getColor(ContentItem.getStatusColor(mStatusInt)));
-        Log.d(TAG, "onItemSelected: changed color to " + ContentItem.getStatusColor(mStatusInt));
+        mViewStatus.setTextColor(getResources().getColor(MediaEntry.getStatusColor(mStatusInt)));
+        Log.d(TAG, "onItemSelected: changed color to " + MediaEntry.getStatusColor(mStatusInt));
     }
 
     @Override
