@@ -54,7 +54,7 @@
                 android:visibility="gone" />
 
             <EditText
-                android:id="@+id/view_title"
+                android:id="@+id/edit_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/transparent"
@@ -81,7 +81,7 @@
                 android:visibility="gone" />
 
             <EditText
-                android:id="@+id/view_description"
+                android:id="@+id/edit_description"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/transparent"
@@ -95,6 +95,7 @@
                 tools:text="In Sekiro: Shadows Die Twice you are the one-armed wolf, a disgraced and disfigured warrior rescued from the brink of death. Bound to protect a young lord who is the descendant of an ancient bloodline, you become the target of many vicious enemies, including the dangerous Ashina clan." />
 
             <TextView
+                android:id="@+id/view_status_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
@@ -121,7 +122,7 @@
                 android:visibility="visible"/>
 
             <Spinner
-                android:id="@+id/view_status_spinner"
+                android:id="@+id/status_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="16dp"
@@ -131,6 +132,7 @@
                 android:visibility="gone"/>
 
             <TextView
+                android:id="@+id/view_creator_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
@@ -141,7 +143,7 @@
                 android:textSize="16sp" />
 
             <EditText
-                android:id="@+id/view_creator"
+                android:id="@+id/edit_creator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/transparent"
@@ -155,6 +157,7 @@
                 tools:text="FromSoftware" />
 
             <TextView
+                android:id="@+id/view_date_created_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingLeft="8dp"
@@ -165,7 +168,7 @@
                 android:textSize="16sp" />
 
             <EditText
-                android:id="@+id/view_date_created"
+                android:id="@+id/edit_date_created"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/transparent"

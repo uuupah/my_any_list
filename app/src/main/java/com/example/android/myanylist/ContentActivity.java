@@ -19,6 +19,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.android.myanylist.models.MediaEntry;
+import com.example.android.myanylist.persistence.EntryRepository;
+import com.example.android.myanylist.util.Utility;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ContentActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -31,15 +33,16 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     private ImageView mImageView;
     private ImageButton mBackView, mCheckView;
     private TextView mTitleHeader, mDescriptionHeader, mViewStatus;
-    private EditText mViewTitle, mViewDescription, mViewCreator, mViewDateCreated;
+    private EditText mEditTitle, mEditDescription, mEditCreator, mEditDateCreated;
     private FloatingActionButton mFab;
     private Spinner mSpinnerStatus;
 
     // vars
-    private static MediaEntry mInitialContent;
+    private static MediaEntry mInitialEntry, mFinalEntry;
     private boolean mIsNewEntry;
     private String mTitle, mDescription, mStatus, mCreator, mDateCreated;
     private int mImageRes, mStatusInt, mMode;
+    private EntryRepository mEntryRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,15 +52,13 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         initialiseViews(); // links view variables to their link id
         setListeners(); // set onclicklisteners to appropriate views
 
+        mEntryRepository = new EntryRepository(this);
+
         if (getIncomingIntent()) {
             // new entry, edit mode
             initialiseContent();
             enableEditMode();
 
-            //TODO
-            // on edit:
-            // allow modification of image
-            // swap status with a spinner for statuses
         } else {
             // existing note, view mode
             readContent();
@@ -68,7 +69,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         setSupportActionBar(toolbar);
     }
 
-    private void initialiseViews(){
+    private void initialiseViews() {
         // toolbar buttons
         mBackView = findViewById(R.id.view_back_button);
         mCheckView = findViewById(R.id.view_check_button);
@@ -77,17 +78,18 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mTitleHeader = findViewById(R.id.view_title_header);
         mDescriptionHeader = findViewById(R.id.view_description_header);
 
-        mViewTitle = findViewById(R.id.view_title);
-        mViewDescription = findViewById(R.id.view_description);
+        // content
+        mEditTitle = findViewById(R.id.edit_title);
+        mEditDescription = findViewById(R.id.edit_description);
         mViewStatus = findViewById(R.id.view_status);
-        mViewCreator = findViewById(R.id.view_creator);
-        mViewDateCreated = findViewById(R.id.view_date_created);
+        mEditCreator = findViewById(R.id.edit_creator);
+        mEditDateCreated = findViewById(R.id.edit_date_created);
         mFab = findViewById(R.id.content_fab);
 
         mImageView = findViewById(R.id.view_image);
 
         //set up spinner
-        mSpinnerStatus = findViewById(R.id.view_status_spinner);
+        mSpinnerStatus = findViewById(R.id.status_spinner);
         ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(this, R.array.status, android.R.layout.simple_spinner_item);
         statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerStatus.setAdapter(statusAdapter);
@@ -97,7 +99,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mViewStatus.setTextColor(getResources().getColor(R.color.status_planning_yellow)); // assuming that planning is the default value
     }
 
-    private void setListeners(){
+    private void setListeners() {
         mFab.setOnClickListener(this);
         mCheckView.setOnClickListener(this);
         mBackView.setOnClickListener(this);
@@ -105,8 +107,9 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
 
     private boolean getIncomingIntent() {
         if (getIntent().hasExtra("selected_content")) {
-            mInitialContent = getIntent().getParcelableExtra("selected_content");
-            Log.d(TAG, "onCreate: content imported: " + mInitialContent.toString());
+            mInitialEntry = getIntent().getParcelableExtra("selected_content");
+
+            Log.d(TAG, "onCreate: content imported: " + mInitialEntry.toString());
 
             mMode = EDIT_MODE_DISABLED;
             mIsNewEntry = false;
@@ -117,7 +120,26 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         return true;
     }
 
-    private void enableEditMode(){
+    private void saveChanges() {
+        Log.d(TAG, "saveChanges: saving changes");
+        if (mIsNewEntry) {
+            // insert
+            saveNewEntry();
+        } else {
+            // update
+            updateEntry();
+        }
+    }
+
+    private void updateEntry() {
+        mEntryRepository.updateEntry(mInitialEntry);
+    }
+
+    private void saveNewEntry() {
+        mEntryRepository.insertEntryTask(mInitialEntry);
+    }
+
+    private void enableEditMode() {
         displayEditTextUnderline();
         mBackView.setVisibility(View.GONE);
         mCheckView.setVisibility(View.VISIBLE);
@@ -132,10 +154,10 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
 
         enableContentInteraction();
 
-        mViewTitle.requestFocus();
+        mEditTitle.requestFocus();
     }
 
-    private void disableEditMode(){
+    private void disableEditMode() {
         hideEditTextUnderline();
         mBackView.setVisibility(View.VISIBLE);
         mCheckView.setVisibility(View.GONE);
@@ -148,18 +170,24 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
 
         mFab.show();
 
-        disableContentInteraction(); // probably unnecessary
+        mInitialEntry.setTitle(mEditTitle.getText().toString());
+        mInitialEntry.setDescription(mEditDescription.getText().toString());
+        // status does not need to be set as it is set every time the spinner is changed
+        mInitialEntry.setCreator(mEditCreator.getText().toString());
+        mInitialEntry.setDateCreated(mEditDateCreated.getText().toString());
+        // mInitialEntry.setTimeStamp(Utility.getCurrentTimestamp()); // not sure if this should be changed every time
 
+        saveChanges();
     }
 
-    private void disableContentInteraction(){
-        disableEditText(mViewTitle);
-        disableEditText(mViewDescription);
-        disableEditText(mViewCreator);
-        disableEditText(mViewDateCreated);
+    private void disableContentInteraction() {
+        disableEditText(mEditTitle);
+        disableEditText(mEditDescription);
+        disableEditText(mEditCreator);
+        disableEditText(mEditDateCreated);
     }
 
-    private void disableEditText(EditText v){
+    private void disableEditText(EditText v) {
         v.setKeyListener(null);
         v.setFocusable(false);
         v.setFocusableInTouchMode(false);
@@ -167,21 +195,21 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         v.clearFocus();
     }
 
-    private void enableContentInteraction(){
-        enableEditText(mViewTitle);
-        enableEditText(mViewDescription);
-        enableEditText(mViewCreator);
-        enableEditText(mViewDateCreated);
+    private void enableContentInteraction() {
+        enableEditText(mEditTitle);
+        enableEditText(mEditDescription);
+        enableEditText(mEditCreator);
+        enableEditText(mEditDateCreated);
     }
 
-    private void enableEditText (EditText v){
+    private void enableEditText(EditText v) {
         v.setKeyListener(new EditText(this).getKeyListener());
         v.setFocusable(true);
         v.setFocusableInTouchMode(true);
         v.setCursorVisible(true);
     }
 
-    private void hideSoftKeyboard(){
+    private void hideSoftKeyboard() {
         InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = this.getCurrentFocus();
         if (view == null) {
@@ -191,16 +219,15 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void readContent() {
-        mTitle = mInitialContent.getTitle();
-        mDescription = mInitialContent.getDescription();
-        mStatus = MediaEntry.getStringStatus(mInitialContent.getStatus());
-        mStatusInt = mInitialContent.getStatus();
-        mCreator = mInitialContent.getCreator();
-        mDateCreated = mInitialContent.getDateCreated();
-        mImageRes = mInitialContent.getImage();
+        mTitle = mInitialEntry.getTitle();
+        mDescription = mInitialEntry.getDescription();
+        mStatus = MediaEntry.getStringStatus(mInitialEntry.getStatus());
+        mStatusInt = mInitialEntry.getStatus();
+        mCreator = mInitialEntry.getCreator();
+        mDateCreated = mInitialEntry.getDateCreated();
+        mImageRes = mInitialEntry.getImage();
 
         fillViews();
-
     }
 
     private void initialiseContent() {
@@ -210,40 +237,43 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mStatus = MediaEntry.getStringStatus(mStatusInt);
 //        creator = "Creator";
 //        dateCreated = "01 Jan 1970";
-        mImageRes = R.mipmap.ic_launcher; // temporary image
+        mImageRes = R.drawable.dark_souls; // temporary image
+
+        mInitialEntry = new MediaEntry();
+        mInitialEntry.setTitle("New Entry");
 
         fillViews();
     }
 
     private void fillViews() {
-        mViewTitle.setText(mTitle);
-        mViewDescription.setText(mDescription);
+        mEditTitle.setText(mTitle);
+        mEditDescription.setText(mDescription);
         mViewStatus.setText(mStatus);
-        mViewCreator.setText(mCreator);
-        mViewDateCreated.setText(mDateCreated);
+        mEditCreator.setText(mCreator);
+        mEditDateCreated.setText(mDateCreated);
         mImageView.setImageResource(mImageRes);
         mViewStatus.setTextColor(getResources().getColor(MediaEntry.getStatusColor(mStatusInt)));
     }
 
     private void displayEditTextUnderline() {
-        mViewTitle.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-        mViewDescription.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+        mEditTitle.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+        mEditDescription.setBackgroundTintList(getColorStateList(R.color.grey_underline));
         mViewStatus.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-        mViewCreator.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-        mViewDateCreated.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+        mEditCreator.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+        mEditDateCreated.setBackgroundTintList(getColorStateList(R.color.grey_underline));
     }
 
     private void hideEditTextUnderline() {
-        mViewTitle.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-        mViewDescription.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+        mEditTitle.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+        mEditDescription.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
         mViewStatus.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-        mViewCreator.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-        mViewDateCreated.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+        mEditCreator.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+        mEditDateCreated.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.content_fab:
                 enableEditMode();
                 break;
@@ -259,7 +289,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onBackPressed() {
-        if(mMode == EDIT_MODE_ENABLED) {
+        if (mMode == EDIT_MODE_ENABLED) {
             onClick(mCheckView);
         } else {
             super.onBackPressed();
@@ -276,7 +306,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mMode = savedInstanceState.getInt("mode");
-        if(mMode == EDIT_MODE_ENABLED){
+        if (mMode == EDIT_MODE_ENABLED) {
             enableEditMode();
         }
     }
@@ -286,6 +316,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         mStatusInt = position;
         mStatus = MediaEntry.getStringStatus(position);
+        mInitialEntry.setStatus(position);
         mViewStatus.setText(mStatus);
         mViewStatus.setTextColor(getResources().getColor(MediaEntry.getStatusColor(mStatusInt)));
         Log.d(TAG, "onItemSelected: changed color to " + MediaEntry.getStatusColor(mStatusInt));

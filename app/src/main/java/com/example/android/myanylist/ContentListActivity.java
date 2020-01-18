@@ -1,3 +1,24 @@
+//TODO
+// change deletion behaviour from swiping to the right to a swipe menu (button that appears when swiping a certain amount)
+// (apparently ultimate recycler can do this)
+// alternatively, implement an undo delete snackbar that pops up when you swipe an
+// maybe both
+// add delete button in drop down on entry page
+// allow for modification of image
+// -> ensure that mImageRes is updated and then the image view is updated from that
+// use a more robust time input and variable type for media creation date
+// hide uneccesary (empty) titles and views
+// perform small visual tweaks (coloured status header)
+// sort recycler view by status
+// add extra variables that may be useful
+// add rating input (star rating?)
+// add back to top functionality with up arrow
+// add media type variable (i think thats what you have to do in sqlite i dont 100% remember and im sleepy)
+// implement itemtouchhelper.simplecallback onmove to allow rearranging of entries
+// clean up this fucking terrible mess of code
+// give consistent and easier to understand variable names
+
+
 package com.example.android.myanylist;
 
 import androidx.annotation.NonNull;
@@ -12,6 +33,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.android.myanylist.ContentActivity;
+import com.example.android.myanylist.R;
 import com.example.android.myanylist.adapters.EntryRecyclerAdapter;
 import com.example.android.myanylist.models.MediaEntry;
 import com.example.android.myanylist.persistence.EntryRepository;
@@ -74,9 +97,9 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
     }
 
     private void insertFakeContent() {
-        mEntries.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.dark_souls));
-        mEntries.add(new MediaEntry("Bloodborne", 10, "2 jan 2020", "2 jan 2020", 1, "FromSoftware", "Bloodborne follows the player's character, a hunter, through the decrepit city of yharnam", R.drawable.bloodborne));
-        mEntries.add(new MediaEntry("Sekiro", 9, "3 jan 2020", "3 jan 2020", 0, "FromSoftware", "Sekiro takes place in the sengoku period in japan, and follows a shinobi known as wolf as he attempts to take revenge on a samurai clan who attacked him and kidnapped his lord", R.drawable.sekiro));
+        mEntries.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.dark_souls));
+        mEntries.add(new MediaEntry("Bloodborne", 10, "2 jan 2020", 1, "FromSoftware", "Bloodborne follows the player's character, a hunter, through the decrepit city of yharnam", R.drawable.bloodborne));
+        mEntries.add(new MediaEntry("Sekiro", 9, "3 jan 2020", 0, "FromSoftware", "Sekiro takes place in the sengoku period in japan, and follows a shinobi known as wolf as he attempts to take revenge on a samurai clan who attacked him and kidnapped his lord", R.drawable.sekiro));
         mEntryRecyclerAdapter.notifyDataSetChanged();
     }
 
@@ -111,12 +134,14 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
     private void deleteEntry(MediaEntry entry){
         mEntries.remove(entry);
         mEntryRecyclerAdapter.notifyDataSetChanged();
+
+        mMediaEntryRepository.deleteEntry(entry);
     }
 
     private ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
         @Override
         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            return false; //TODO implement this at some point to allow rearranging the list
+            return false;
         }
 
         @Override
@@ -125,8 +150,5 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
         }
     };
 
-    //TODO
-    // implement soft swipe delete (swiping reveals a delete menu item)
-    // ultimate recycler view is apparently good?
-    // or implement an undo snackbar (lesser solution)
+
 }

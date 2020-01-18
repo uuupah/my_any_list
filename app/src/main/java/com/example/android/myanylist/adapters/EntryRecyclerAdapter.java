@@ -34,7 +34,7 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
     // fills contents of view depending on current position in database
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.date.setText(mItems.get(position).getDateAdded());
+        holder.date.setText(mItems.get(position).getTimeStamp());
         holder.title.setText(mItems.get(position).getTitle());
         holder.status.setText(MediaEntry.getStringStatus(mItems.get(position).getStatus()));
         holder.image.setImageResource(mItems.get(position).getImage());
