@@ -14,12 +14,12 @@ import com.example.android.myanylist.models.MediaEntry;
 
 import java.util.ArrayList;
 
-public class ContentRecyclerAdapter extends RecyclerView.Adapter<ContentRecyclerAdapter.ViewHolder> {
+public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdapter.ViewHolder> {
 
     private ArrayList<MediaEntry> mItems = new ArrayList<>();
     private OnContentListener mOnContentListener;
 
-    public ContentRecyclerAdapter(ArrayList<MediaEntry> items, OnContentListener onContentListener) {
+    public EntryRecyclerAdapter(ArrayList<MediaEntry> items, OnContentListener onContentListener) {
         this.mItems = items;
         this.mOnContentListener = onContentListener;
     }

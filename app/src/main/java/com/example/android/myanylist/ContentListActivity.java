@@ -3,6 +3,7 @@ package com.example.android.myanylist;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,31 +12,41 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.android.myanylist.adapters.ContentRecyclerAdapter;
+import com.example.android.myanylist.adapters.EntryRecyclerAdapter;
 import com.example.android.myanylist.models.MediaEntry;
+import com.example.android.myanylist.persistence.EntryRepository;
 import com.example.android.myanylist.util.VerticalSpacingItemDecorator;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ContentListActivity extends AppCompatActivity implements ContentRecyclerAdapter.OnContentListener, FloatingActionButton.OnClickListener {
+public class ContentListActivity extends AppCompatActivity implements EntryRecyclerAdapter.OnContentListener, FloatingActionButton.OnClickListener {
 
     // ui components
     private RecyclerView mRecyclerView;
 
     // vars (anything that isnt a view or a widget)
-    private ArrayList<MediaEntry> mContent = new ArrayList<>();
-    private ContentRecyclerAdapter mContentRecyclerAdapter;
+    private ArrayList<MediaEntry> mEntries = new ArrayList<>();
+    private EntryRecyclerAdapter mEntryRecyclerAdapter;
+    private EntryRepository mMediaEntryRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_list);
 
+        // the recycler here just dumps all of the data in the database onto the screen
+        // but the aim is to have it sorted planning -> in progress -> completed -> dropped
+        // the two ways to handle this appear to be either
+        // sort the list in the sqlite query (probably the easiest way to do it but might misbehave?)
+        // create four linked recycler views that process each type of element in sequence (this might not work either)
         mRecyclerView = findViewById(R.id.content_recycler_view);       // attach the variable to its id
 
+        mMediaEntryRepository = new EntryRepository(this);
         initRecyclerView();
-        insertFakeContent();
+        retrieveEntries();
+//        insertFakeContent();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.content_list_toolbar);
         setSupportActionBar(toolbar);
@@ -45,11 +56,28 @@ public class ContentListActivity extends AppCompatActivity implements ContentRec
         findViewById(R.id.list_fab).setOnClickListener(this);
     }
 
+    private void retrieveEntries(){
+        // triggers when the observer is attached and on any subsequent changes to the repository
+        // this can be used for both initial startup and updating further changes to the databases
+        mMediaEntryRepository.retrieveEntryTask().observe(this, new Observer<List<MediaEntry>>() {
+            @Override
+            public void onChanged(List<MediaEntry> mediaEntries) {
+                if(mEntries.size() > 0) {
+                    mEntries.clear();
+                }
+                if(mediaEntries != null){
+                    mEntries.addAll(mediaEntries);
+                }
+                mEntryRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
     private void insertFakeContent() {
-        mContent.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.dark_souls));
-        mContent.add(new MediaEntry("Bloodborne", 10, "2 jan 2020", "2 jan 2020", 1, "FromSoftware", "Bloodborne follows the player's character, a hunter, through the decrepit city of yharnam", R.drawable.bloodborne));
-        mContent.add(new MediaEntry("Sekiro", 9, "3 jan 2020", "3 jan 2020", 0, "FromSoftware", "Sekiro takes place in the sengoku period in japan, and follows a shinobi known as wolf as he attempts to take revenge on a samurai clan who attacked him and kidnapped his lord", R.drawable.sekiro));
-        mContentRecyclerAdapter.notifyDataSetChanged();
+        mEntries.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.dark_souls));
+        mEntries.add(new MediaEntry("Bloodborne", 10, "2 jan 2020", "2 jan 2020", 1, "FromSoftware", "Bloodborne follows the player's character, a hunter, through the decrepit city of yharnam", R.drawable.bloodborne));
+        mEntries.add(new MediaEntry("Sekiro", 9, "3 jan 2020", "3 jan 2020", 0, "FromSoftware", "Sekiro takes place in the sengoku period in japan, and follows a shinobi known as wolf as he attempts to take revenge on a samurai clan who attacked him and kidnapped his lord", R.drawable.sekiro));
+        mEntryRecyclerAdapter.notifyDataSetChanged();
     }
 
     private void initRecyclerView() {
@@ -58,15 +86,15 @@ public class ContentListActivity extends AppCompatActivity implements ContentRec
         VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(16);
         mRecyclerView.addItemDecoration(itemDecorator);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
-        mContentRecyclerAdapter = new ContentRecyclerAdapter(mContent, this);
-        mRecyclerView.setAdapter(mContentRecyclerAdapter);
+        mEntryRecyclerAdapter = new EntryRecyclerAdapter(mEntries, this);
+        mRecyclerView.setAdapter(mEntryRecyclerAdapter);
     }
 
     @Override
     public void onContentClick(int position) {
-        mContent.get(position);
+        mEntries.get(position);
         Intent intent = new Intent(this, ContentActivity.class);
-        intent.putExtra("selected_content", mContent.get(position));
+        intent.putExtra("selected_content", mEntries.get(position));
         startActivity(intent);
     }
 
@@ -81,8 +109,8 @@ public class ContentListActivity extends AppCompatActivity implements ContentRec
     }
 
     private void deleteEntry(MediaEntry entry){
-        mContent.remove(entry);
-        mContentRecyclerAdapter.notifyDataSetChanged();
+        mEntries.remove(entry);
+        mEntryRecyclerAdapter.notifyDataSetChanged();
     }
 
     private ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
@@ -93,7 +121,7 @@ public class ContentListActivity extends AppCompatActivity implements ContentRec
 
         @Override
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            deleteEntry(mContent.get(viewHolder.getAdapterPosition()));
+            deleteEntry(mEntries.get(viewHolder.getAdapterPosition()));
         }
     };
 
