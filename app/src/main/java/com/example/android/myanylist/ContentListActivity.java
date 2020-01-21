@@ -1,4 +1,5 @@
 //TODO
+// create an icon
 // change deletion behaviour from swiping to the right to a swipe menu (button that appears when swiping a certain amount)
 // (apparently ultimate recycler can do this)
 // alternatively, implement an undo delete snackbar that pops up when you swipe an
@@ -17,7 +18,6 @@
 // implement itemtouchhelper.simplecallback onmove to allow rearranging of entries
 // clean up this fucking terrible mess of code
 // give consistent and easier to understand variable names
-
 
 package com.example.android.myanylist;
 
