@@ -3,10 +3,17 @@ package com.example.android.myanylist;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -28,6 +35,8 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     private static final String TAG = "ContentActivity";
     private static final int EDIT_MODE_ENABLED = 1;
     private static final int EDIT_MODE_DISABLED = 0;
+    private static final int STORAGE_PERMISSION_CODE = 100;
+    private static final int PICK_IMAGE = 101;
 
     // ui components
     private ImageView mImageView;
@@ -38,7 +47,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mSpinnerStatus;
 
     // vars
-    private static MediaEntry mInitialEntry, mFinalEntry;
+    private static MediaEntry mInitialEntry;
     private boolean mIsNewEntry;
     private String mTitle, mDescription, mStatus, mCreator, mDateCreated;
     private int mImageRes, mStatusInt, mMode;
@@ -49,6 +58,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
 
+        requestStoragePermission(); // request access to storage through android
         initialiseViews(); // links view variables to their link id
         setListeners(); // set onclicklisteners to appropriate views
 
@@ -96,13 +106,14 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mSpinnerStatus.setOnItemSelectedListener(this);
 
         // update status color
-        mViewStatus.setTextColor(getResources().getColor(R.color.status_planning_yellow)); // assuming that planning is the default value
+        mViewStatus.setTextColor(ContextCompat.getColor(this, R.color.status_planning_yellow)); // assuming that planning is the default value
     }
 
     private void setListeners() {
         mFab.setOnClickListener(this);
         mCheckView.setOnClickListener(this);
         mBackView.setOnClickListener(this);
+        mImageView.setOnClickListener(this);
     }
 
     private boolean getIncomingIntent() {
@@ -284,6 +295,9 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.view_back_button:
                 finish();
                 break;
+            case R.id.view_image:
+//                pickImage();
+                break;
         }
     }
 
@@ -326,4 +340,34 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+    // methods for handling image input
+    private void pickImage() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        //        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE);
+    }
+
+    private void requestStoragePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE
+                    , Manifest.permission.ACCESS_NETWORK_STATE, Manifest.permission.WRITE_EXTERNAL_STORAGE
+            }, STORAGE_PERMISSION_CODE);
+        }
+    }
+
+    // onActivityResult
+        // check activities of type PICK_IMAGE
+        // check there is data attached
+        // try/catch for filenotfoundexception
+            // assign data from return to a uri
+            // use bitmapfactory to get a bitmap from the uri
+            // get the path for said uri
+        // (for now) update image view with new image
 }

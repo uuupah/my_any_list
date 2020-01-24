@@ -26,7 +26,8 @@ public class MediaEntry implements Parcelable {
     @NonNull @ColumnInfo(name = "status")   private int status;             // the status of consumption (planning, watching, completed etc
     @ColumnInfo(name = "creator")           private String creator;         // the name of the creator
     @ColumnInfo(name = "description")       private String description;     // description of the piece of media
-    @ColumnInfo(name = "image")             private int image;              // location of splash image depicting the piece of media;
+    @ColumnInfo(name = "image")             private int image;              // resource id of splash image depicting the piece of media;
+    @ColumnInfo(name = "image_location")    private String imageLocation;   // filesystem location of splash image
 
     // standard constructor
     public MediaEntry(String title, int score, String dateCreated, int status, String creator, String description, int image) {
@@ -103,6 +104,7 @@ public class MediaEntry implements Parcelable {
     public String getCreator() {return creator;}
     public String getDescription() {return description;}
     public int getImage() {return image;}
+    public String getImageLocation() {return imageLocation;}
 
     // setter methods
     public void setId(int id) {this.id = id;}
@@ -114,6 +116,7 @@ public class MediaEntry implements Parcelable {
     public void setCreator(String creator) {this.creator = creator;}
     public void setDescription(String description) {this.description = description;}
     public void setImage(int image) {this.image = image;}
+    public void setImageLocation (String imageLocation) {this.imageLocation = imageLocation;}
 
     // status types
     public final static int STATUS_PLANNING = 0;
@@ -170,5 +173,6 @@ public class MediaEntry implements Parcelable {
         dest.writeString(creator);
         dest.writeString(description);
         dest.writeInt(image);
+        dest.writeString(imageLocation);
     }
 }

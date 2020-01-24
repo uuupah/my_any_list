@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.myanylist.R;
@@ -38,6 +39,8 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
         holder.title.setText(mItems.get(position).getTitle());
         holder.status.setText(MediaEntry.getStringStatus(mItems.get(position).getStatus()));
         holder.image.setImageResource(mItems.get(position).getImage());
+        holder.status.setTextColor(ContextCompat.getColor(holder.status.getContext(), MediaEntry.getStatusColor(mItems.get(position).getStatus())));
+        holder.blocker.setBackgroundColor(ContextCompat.getColor(holder.blocker.getContext(), MediaEntry.getStatusColor(mItems.get(position).getStatus())));
     }
 
     @Override
@@ -48,6 +51,7 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView title, status, date;
         private ImageView image;
+        private View blocker;
 
         OnContentListener onContentListener;
 
@@ -57,6 +61,7 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
             title = itemView.findViewById(R.id.content_list_item_title);
             status = itemView.findViewById(R.id.content_list_item_status);
             image = itemView.findViewById(R.id.content_list_item_image);
+            blocker = itemView.findViewById(R.id.content_list_item_blocker);
 
             this.onContentListener = onContentListener;
 

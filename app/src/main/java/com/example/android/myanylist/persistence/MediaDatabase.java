@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 
 import com.example.android.myanylist.models.MediaEntry;
 
-@Database(entities = {MediaEntry.class}, version = 2)
+@Database(entities = {MediaEntry.class}, version = 3)
 public abstract class MediaDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "media_db";

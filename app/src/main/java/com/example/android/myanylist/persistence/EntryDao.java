@@ -19,7 +19,7 @@ public interface EntryDao {
     @Insert
     long[] insertEntry(MediaEntry... entries);
 
-    @Query("SELECT * FROM entries")
+    @Query("SELECT * FROM entries ORDER BY status, title")
     LiveData<List<MediaEntry>> getEntries();
 
 //    @Query("SELECT * FROM entries WHERE id = :id")

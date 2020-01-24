@@ -1,21 +1,22 @@
 //TODO
-// create an icon
+// allow for modification of image
+// -> ensure that mImageRes is updated and then the image view is updated from that
+// hide uneccesary (empty) titles and views
+// add extra variables that may be useful
+// add rating input (star rating?)
+// separate edit and view activities
 // change deletion behaviour from swiping to the right to a swipe menu (button that appears when swiping a certain amount)
 // (apparently ultimate recycler can do this)
 // alternatively, implement an undo delete snackbar that pops up when you swipe an
 // maybe both
 // add delete button in drop down on entry page
-// allow for modification of image
-// -> ensure that mImageRes is updated and then the image view is updated from that
 // use a more robust time input and variable type for media creation date
-// hide uneccesary (empty) titles and views
-// perform small visual tweaks (coloured status header)
-// sort recycler view by status
 // add extra variables that may be useful
 // add rating input (star rating?)
 // add back to top functionality with up arrow
 // add media type variable (i think thats what you have to do in sqlite i dont 100% remember and im sleepy)
 // implement itemtouchhelper.simplecallback onmove to allow rearranging of entries
+// add headers between
 // clean up this fucking terrible mess of code
 // give consistent and easier to understand variable names
 
@@ -24,6 +25,7 @@ package com.example.android.myanylist;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,8 +35,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import com.example.android.myanylist.ContentActivity;
-import com.example.android.myanylist.R;
 import com.example.android.myanylist.adapters.EntryRecyclerAdapter;
 import com.example.android.myanylist.models.MediaEntry;
 import com.example.android.myanylist.persistence.EntryRepository;
@@ -59,22 +59,16 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_list);
 
-        // the recycler here just dumps all of the data in the database onto the screen
-        // but the aim is to have it sorted planning -> in progress -> completed -> dropped
-        // the two ways to handle this appear to be either
-        // sort the list in the sqlite query (probably the easiest way to do it but might misbehave?)
-        // create four linked recycler views that process each type of element in sequence (this might not work either)
         mRecyclerView = findViewById(R.id.content_recycler_view);       // attach the variable to its id
 
         mMediaEntryRepository = new EntryRepository(this);
         initRecyclerView();
         retrieveEntries();
-//        insertFakeContent();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.content_list_toolbar);
         setSupportActionBar(toolbar);
         setTitle("Games");
-        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white));
+        toolbar.setTitleTextColor(ContextCompat.getColor(this,android.R.color.white));
 
         findViewById(R.id.list_fab).setOnClickListener(this);
     }
@@ -134,7 +128,6 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
     private void deleteEntry(MediaEntry entry){
         mEntries.remove(entry);
         mEntryRecyclerAdapter.notifyDataSetChanged();
-
         mMediaEntryRepository.deleteEntry(entry);
     }
 
@@ -148,7 +141,5 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
         public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
             deleteEntry(mEntries.get(viewHolder.getAdapterPosition()));
         }
-    };
-
-
+    };  
 }
