@@ -1,6 +1,7 @@
 package com.example.android.myanylist;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -10,6 +11,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -24,11 +29,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.android.myanylist.models.MediaEntry;
 import com.example.android.myanylist.persistence.EntryRepository;
 import com.example.android.myanylist.util.Utility;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.FileNotFoundException;
 
 public class ContentActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
@@ -52,6 +61,8 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     private String mTitle, mDescription, mStatus, mCreator, mDateCreated;
     private int mImageRes, mStatusInt, mMode;
     private EntryRepository mEntryRepository;
+    private Uri mSelectedImage;
+    private Bitmap mBitmap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,7 +124,6 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mFab.setOnClickListener(this);
         mCheckView.setOnClickListener(this);
         mBackView.setOnClickListener(this);
-        mImageView.setOnClickListener(this);
     }
 
     private boolean getIncomingIntent() {
@@ -159,6 +169,8 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mSpinnerStatus.setVisibility(View.VISIBLE);
         mViewStatus.setVisibility(View.GONE);
 
+        mImageView.setOnClickListener(this);
+
         mMode = EDIT_MODE_ENABLED;
 
         mFab.hide();
@@ -176,6 +188,8 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mDescriptionHeader.setVisibility(View.GONE);
         mSpinnerStatus.setVisibility(View.GONE);
         mViewStatus.setVisibility(View.VISIBLE);
+
+        mImageView.setOnClickListener(null); // disable edit mode button
 
         mMode = EDIT_MODE_DISABLED;
 
@@ -296,7 +310,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                 finish();
                 break;
             case R.id.view_image:
-//                pickImage();
+                pickImage();
                 break;
         }
     }
@@ -344,6 +358,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     // methods for handling image input
     private void pickImage() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//        startActivity(intent);
         //        intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE);
     }
@@ -370,4 +385,61 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
             // use bitmapfactory to get a bitmap from the uri
             // get the path for said uri
         // (for now) update image view with new image
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
+            if (data == null) {
+                Toast.makeText(this, "no image returned", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            try {
+                mSelectedImage = data.getData();
+                if (mSelectedImage != null && getContentResolver() != null){
+                    mBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(mSelectedImage));
+                    String path = getPath(mSelectedImage);
+                    if (path != null){
+                        Glide.with(ContentActivity.this).asBitmap().load(mBitmap).into(mImageView);     // only using glide based on other code, either update the rest of the code
+                                                                                                               // to use glide, or change this to regular android commands
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                Log.e(TAG, "onActivityResult: error updating image", e);
+            }
+        }
+    }
+
+//     copied
+    private String getPath(Uri uri) {
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            String document_id = cursor.getString(0);
+            document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
+            cursor.close();
+            cursor = getContentResolver().query(
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+                cursor.close();
+                return path;
+            }
+        }
+        return null;
+    }
+
+//    private void saveImage(MediaEntry entry, String count) {
+//
+//        if (Utility.saveImageToInternalStorage(getApplicationContext(), mBitmap, mEditTitle + count)) {
+//            entry.setImageLocation(String.valueOf(getFileStreamPath(placename.getSelectedItem().toString() + count)));
+//            Toast.makeText(this, "Successfully Saved", Toast.LENGTH_SHORT).show();
+//            AppDatabase.getAppDatabase(getApplicationContext()).userDao().insertAll(user);
+//            Toast.makeText(getApplicationContext(), "" + AppDatabase.getAppDatabase(getApplicationContext()).userDao().countusers(), Toast.LENGTH_SHORT).show();
+//        } else {
+//            Toast.makeText(this, "Failed to save image", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 }
