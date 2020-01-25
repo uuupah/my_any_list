@@ -37,11 +37,12 @@ import com.example.android.myanylist.persistence.EntryRepository;
 import com.example.android.myanylist.util.Utility;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 
-public class ContentActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class DetailsActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
-    private static final String TAG = "ContentActivity";
+    private static final String TAG = "DetailsActivity";
     private static final int EDIT_MODE_ENABLED = 1;
     private static final int EDIT_MODE_DISABLED = 0;
     private static final int STORAGE_PERMISSION_CODE = 100;
@@ -58,7 +59,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     // vars
     private static MediaEntry mInitialEntry;
     private boolean mIsNewEntry;
-    private String mTitle, mDescription, mStatus, mCreator, mDateCreated;
+    private String mTitle, mDescription, mStatus, mCreator, mDateCreated, mImageLocation;
     private int mImageRes, mStatusInt, mMode;
     private EntryRepository mEntryRepository;
     private Uri mSelectedImage;
@@ -154,10 +155,12 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
 
     private void updateEntry() {
         mEntryRepository.updateEntry(mInitialEntry);
+        Log.d(TAG, "updateEntry: updated entry with " + mInitialEntry.toString());
     }
 
     private void saveNewEntry() {
         mEntryRepository.insertEntryTask(mInitialEntry);
+        Log.d(TAG, "saveNewEntry: inserted entry with " + mInitialEntry.toString());
     }
 
     private void enableEditMode() {
@@ -201,6 +204,8 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mInitialEntry.setCreator(mEditCreator.getText().toString());
         mInitialEntry.setDateCreated(mEditDateCreated.getText().toString());
         // mInitialEntry.setTimeStamp(Utility.getCurrentTimestamp()); // not sure if this should be changed every time
+        mInitialEntry.setImageLocation(mImageLocation);
+        Toast.makeText(this, "image location = " + mImageLocation, Toast.LENGTH_SHORT).show();
 
         saveChanges();
     }
@@ -251,6 +256,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mCreator = mInitialEntry.getCreator();
         mDateCreated = mInitialEntry.getDateCreated();
         mImageRes = mInitialEntry.getImage();
+        mImageLocation = mInitialEntry.getImageLocation();
 
         fillViews();
     }
@@ -262,7 +268,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mStatus = MediaEntry.getStringStatus(mStatusInt);
 //        creator = "Creator";
 //        dateCreated = "01 Jan 1970";
-        mImageRes = R.drawable.dark_souls; // temporary image
+        mImageRes = R.drawable.placeholder_image; // temporary image
 
         mInitialEntry = new MediaEntry();
         mInitialEntry.setTitle("New Entry");
@@ -276,8 +282,14 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         mViewStatus.setText(mStatus);
         mEditCreator.setText(mCreator);
         mEditDateCreated.setText(mDateCreated);
-        mImageView.setImageResource(mImageRes);
         mViewStatus.setTextColor(getResources().getColor(MediaEntry.getStatusColor(mStatusInt)));
+
+        // check if image file and imagelocation is valid, if not, display default image
+        if(Utility.isValidImageLocation(mImageLocation)){
+            Glide.with(this).load(Uri.fromFile(new File(mImageLocation))).into(mImageView);
+        } else {
+            mImageView.setImageResource(R.drawable.placeholder_image);
+        }
     }
 
     private void displayEditTextUnderline() {
@@ -401,8 +413,10 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     mBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(mSelectedImage));
                     String path = getPath(mSelectedImage);
                     if (path != null){
-                        Glide.with(ContentActivity.this).asBitmap().load(mBitmap).into(mImageView);     // only using glide based on other code, either update the rest of the code
+                        Glide.with(DetailsActivity.this).asBitmap().load(mBitmap).into(mImageView);     // only using glide based on other code, either update the rest of the code
                                                                                                                // to use glide, or change this to regular android commands
+                        mImageLocation = path;
+                        Toast.makeText(this, "image location = " + mImageLocation, Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (FileNotFoundException e) {

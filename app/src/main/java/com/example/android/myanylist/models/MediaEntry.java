@@ -51,7 +51,7 @@ public class MediaEntry implements Parcelable {
         this.status = 0;
         this.creator = "creator";
         this.description = "description";
-        this.image = R.drawable.dark_souls;
+        this.image = R.drawable.placeholder_image;
     };
 
     protected MediaEntry(Parcel in) {
@@ -64,6 +64,7 @@ public class MediaEntry implements Parcelable {
         creator = in.readString();
         description = in.readString();
         image = in.readInt();
+        imageLocation = in.readString();
     }
 
     public static final Creator<MediaEntry> CREATOR = new Creator<MediaEntry>() {
@@ -79,6 +80,8 @@ public class MediaEntry implements Parcelable {
     };
 
     // tostring method
+
+
     @Override
     public String toString() {
         return "MediaEntry{" +
@@ -87,10 +90,11 @@ public class MediaEntry implements Parcelable {
                 ", score=" + score +
                 ", timeStamp='" + timeStamp + '\'' +
                 ", dateCreated='" + dateCreated + '\'' +
-                ", status='" + status + '\'' +
+                ", status=" + status +
                 ", creator='" + creator + '\'' +
                 ", description='" + description + '\'' +
                 ", image=" + image +
+                ", imageLocation='" + imageLocation + '\'' +
                 '}';
     }
 

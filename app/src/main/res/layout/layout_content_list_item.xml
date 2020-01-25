@@ -27,7 +27,7 @@
             android:layout_height="match_parent"
             android:layout_marginRight="8dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/dark_souls" />
+            android:src="@drawable/placeholder_image" />
 
         <LinearLayout
             android:layout_width="wrap_content"

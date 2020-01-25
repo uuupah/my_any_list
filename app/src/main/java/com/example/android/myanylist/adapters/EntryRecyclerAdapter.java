@@ -1,5 +1,6 @@
 package com.example.android.myanylist.adapters;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.android.myanylist.R;
 import com.example.android.myanylist.models.MediaEntry;
+import com.example.android.myanylist.util.Utility;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdapter.ViewHolder> {
@@ -38,9 +42,15 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
         holder.date.setText(mItems.get(position).getTimeStamp());
         holder.title.setText(mItems.get(position).getTitle());
         holder.status.setText(MediaEntry.getStringStatus(mItems.get(position).getStatus()));
-        holder.image.setImageResource(mItems.get(position).getImage());
         holder.status.setTextColor(ContextCompat.getColor(holder.status.getContext(), MediaEntry.getStatusColor(mItems.get(position).getStatus())));
         holder.blocker.setBackgroundColor(ContextCompat.getColor(holder.blocker.getContext(), MediaEntry.getStatusColor(mItems.get(position).getStatus())));
+
+        // check if image file and imagelocation is valid, if not, display default image
+        if(Utility.isValidImageLocation(mItems.get(position).getImageLocation())){
+            Glide.with(holder.image.getContext()).load(Uri.fromFile(new File(mItems.get(position).getImageLocation()))).into(holder.image);
+        } else {
+            holder.image.setImageResource(R.drawable.placeholder_image);
+        }
     }
 
     @Override

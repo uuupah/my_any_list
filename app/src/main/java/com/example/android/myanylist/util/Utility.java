@@ -3,13 +3,20 @@ package com.example.android.myanylist.util;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.util.Log;
 
+import com.bumptech.glide.Glide;
+import com.example.android.myanylist.R;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Utility {
+    private static final String TAG = "Utility";
 
     public static String getCurrentTimestamp(){
         try{
@@ -19,6 +26,25 @@ public class Utility {
             return currentDateTime;
         }catch(Exception e){
             return null;
+        }
+    }
+
+    public static boolean isValidImageLocation(String loc){
+
+        if(loc == null || !(new File(loc).exists())){
+            Log.d(TAG, "fillViews: file does not exist");
+            return false;
+        }
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(loc, options);
+        if(options.outWidth != -1 && options.outHeight != -1) {
+            Log.d(TAG, "isValidImageLocation: valid file at location");
+            return true;
+        } else {
+            Log.d(TAG, "isValidImageLocation: invalid file at location");
+            return true;
         }
     }
 

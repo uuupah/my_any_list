@@ -91,7 +91,7 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
     }
 
     private void insertFakeContent() {
-        mEntries.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.dark_souls));
+        mEntries.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.placeholder_image));
         mEntries.add(new MediaEntry("Bloodborne", 10, "2 jan 2020", 1, "FromSoftware", "Bloodborne follows the player's character, a hunter, through the decrepit city of yharnam", R.drawable.bloodborne));
         mEntries.add(new MediaEntry("Sekiro", 9, "3 jan 2020", 0, "FromSoftware", "Sekiro takes place in the sengoku period in japan, and follows a shinobi known as wolf as he attempts to take revenge on a samurai clan who attacked him and kidnapped his lord", R.drawable.sekiro));
         mEntryRecyclerAdapter.notifyDataSetChanged();
@@ -110,7 +110,7 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
     @Override
     public void onContentClick(int position) {
         mEntries.get(position);
-        Intent intent = new Intent(this, ContentActivity.class);
+        Intent intent = new Intent(this, DetailsActivity.class);
         intent.putExtra("selected_content", mEntries.get(position));
         startActivity(intent);
     }
@@ -119,7 +119,7 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.list_fab:
-                Intent intent = new Intent(this, ContentActivity.class);
+                Intent intent = new Intent(this, DetailsActivity.class);
                 startActivity(intent);
                 break;
         }
