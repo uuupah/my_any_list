@@ -41,7 +41,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 public class DetailsActivity extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
-
+    // constant variables
     private static final String TAG = "DetailsActivity";
     private static final int EDIT_MODE_ENABLED = 1;
     private static final int EDIT_MODE_DISABLED = 0;
@@ -57,10 +57,10 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
     private Spinner mSpinnerStatus;
 
     // vars
-    private static MediaEntry mInitialEntry;
+    private static MediaEntry mEntry;
     private boolean mIsNewEntry;
     private String mTitle, mDescription, mStatus, mCreator, mDateCreated, mImageLocation;
-    private int mImageRes, mStatusInt, mMode;
+    private int mStatusInt, mMode;
     private EntryRepository mEntryRepository;
     private Uri mSelectedImage;
     private Bitmap mBitmap;
@@ -70,55 +70,49 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
 
-        requestStoragePermission(); // request access to storage through android
-        initialiseViews(); // links view variables to their link id
-        setListeners(); // set onclicklisteners to appropriate views
+        requestStoragePermission();                                                                 // request access to storage through android
+        initialiseViews();                                                                          // links view variables to their link id
+        setListeners();                                                                             // set onclicklisteners to appropriate views
 
-        mEntryRepository = new EntryRepository(this);
+        mEntryRepository = new EntryRepository(this);                                       // initialise repository
 
-        if (getIncomingIntent()) {
-            // new entry, edit mode
-            initialiseContent();
-            enableEditMode();
-
-        } else {
-            // existing note, view mode
-            readContent();
-            disableContentInteraction();
+        if (getIncomingIntent()) {                                                                  // - new entry, edit mode
+            initialiseContent();                                                                    // create default data for a new entry
+            enableEditMode();                                                                       // put the activity in "edit mode"
+        } else {                                                                                    // - existing note, view mode
+            readContent();                                                                          // read in the data passed through the intent to the variables in this activity
+            disableContentInteraction();                                                            // put the activity in "view mode"
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.content_list_toolbar);
+        Toolbar toolbar = findViewById(R.id.content_list_toolbar);                                  // initialise toolbar
         setSupportActionBar(toolbar);
     }
 
+    /** attach each view variable to a view id, set up spinner **/
     private void initialiseViews() {
-        // toolbar buttons
-        mBackView = findViewById(R.id.view_back_button);
+        mBackView = findViewById(R.id.view_back_button);                                            // toolbar buttons
         mCheckView = findViewById(R.id.view_check_button);
 
-        // headers that are shown during edit mode
-        mTitleHeader = findViewById(R.id.view_title_header);
+        mTitleHeader = findViewById(R.id.view_title_header);                                        // headers that are shown during edit mode
         mDescriptionHeader = findViewById(R.id.view_description_header);
 
-        // content
-        mEditTitle = findViewById(R.id.edit_title);
+        mEditTitle = findViewById(R.id.edit_title);                                                 // content
         mEditDescription = findViewById(R.id.edit_description);
         mViewStatus = findViewById(R.id.view_status);
         mEditCreator = findViewById(R.id.edit_creator);
         mEditDateCreated = findViewById(R.id.edit_date_created);
         mFab = findViewById(R.id.content_fab);
-
         mImageView = findViewById(R.id.view_image);
 
-        //set up spinner
-        mSpinnerStatus = findViewById(R.id.status_spinner);
-        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(this, R.array.status, android.R.layout.simple_spinner_item);
-        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpinnerStatus.setAdapter(statusAdapter);
-        mSpinnerStatus.setOnItemSelectedListener(this);
+        mSpinnerStatus = findViewById(R.id.status_spinner);                                         // - set up spinner
+        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(this,    // adapter for spinner options
+                R.array.status, android.R.layout.simple_spinner_item);
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);       // spinner type
+        mSpinnerStatus.setAdapter(statusAdapter);                                                   // attach adapter
+        mSpinnerStatus.setOnItemSelectedListener(this);                                             // set interaction listener
 
-        // update status color
-        mViewStatus.setTextColor(ContextCompat.getColor(this, R.color.status_planning_yellow)); // assuming that planning is the default value
+        mViewStatus.setTextColor(ContextCompat.getColor(this,                               // update status color
+                R.color.status_planning_yellow));                                                   // assuming that planning is the default value
     }
 
     private void setListeners() {
@@ -127,120 +121,111 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
         mBackView.setOnClickListener(this);
     }
 
+    /** transfer contents of attached entry to local entry (if it exists) otherwise, set activity to edit more **/
     private boolean getIncomingIntent() {
         if (getIntent().hasExtra("selected_content")) {
-            mInitialEntry = getIntent().getParcelableExtra("selected_content");
+            mEntry = getIntent().getParcelableExtra("selected_content");
 
-            Log.d(TAG, "onCreate: content imported: " + mInitialEntry.toString());
+            Log.d(TAG, "onCreate: content imported: " + mEntry.toString());
 
             mMode = EDIT_MODE_DISABLED;
             mIsNewEntry = false;
             return false;
+        } else {
+            mMode = EDIT_MODE_ENABLED;
+            mIsNewEntry = true;
+            return true;
         }
-        mMode = EDIT_MODE_ENABLED;
-        mIsNewEntry = true;
-        return true;
     }
 
+    /** pass contents of local entry to database, updating if it already exists or inserting a new entry if it does not **/
     private void saveChanges() {
         Log.d(TAG, "saveChanges: saving changes");
-        if (mIsNewEntry) {
-            // insert
-            saveNewEntry();
-        } else {
-            // update
-            updateEntry();
+        if (mIsNewEntry) {                                                                          // new entry
+            mEntryRepository.insertEntryTask(mEntry);
+            Log.d(TAG, "saveChanges: inserted entry with " + mEntry.toString());
+        } else {                                                                                    // updating existing entry
+            mEntryRepository.updateEntry(mEntry);
+            Log.d(TAG, "saveChanges: updated entry with " + mEntry.toString());
         }
-    }
-
-    private void updateEntry() {
-        mEntryRepository.updateEntry(mInitialEntry);
-        Log.d(TAG, "updateEntry: updated entry with " + mInitialEntry.toString());
-    }
-
-    private void saveNewEntry() {
-        mEntryRepository.insertEntryTask(mInitialEntry);
-        Log.d(TAG, "saveNewEntry: inserted entry with " + mInitialEntry.toString());
     }
 
     private void enableEditMode() {
-        displayEditTextUnderline();
-        mBackView.setVisibility(View.GONE);
+        mEditTitle.setBackgroundTintList(getColorStateList(R.color.grey_underline));                // display edittext underlines
+        mEditDescription.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+        mViewStatus.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+        mEditCreator.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+        mEditDateCreated.setBackgroundTintList(getColorStateList(R.color.grey_underline));
+
+        mBackView.setVisibility(View.GONE);                                                         // swap visibilty of views
         mCheckView.setVisibility(View.VISIBLE);
         mTitleHeader.setVisibility(View.VISIBLE);
         mDescriptionHeader.setVisibility(View.VISIBLE);
         mSpinnerStatus.setVisibility(View.VISIBLE);
         mViewStatus.setVisibility(View.GONE);
-
-        mImageView.setOnClickListener(this);
-
-        mMode = EDIT_MODE_ENABLED;
-
         mFab.hide();
 
+        mMode = EDIT_MODE_ENABLED;
         enableContentInteraction();
-
         mEditTitle.requestFocus();
     }
 
     private void disableEditMode() {
-        hideEditTextUnderline();
-        mBackView.setVisibility(View.VISIBLE);
+        mEditTitle.setBackgroundTintList(getColorStateList(R.color.transparent_underline));         // hide edittext underlines
+        mEditDescription.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+        mViewStatus.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+        mEditCreator.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+        mEditDateCreated.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
+
+        mBackView.setVisibility(View.VISIBLE);                                                      // swap visibility of some views
         mCheckView.setVisibility(View.GONE);
         mTitleHeader.setVisibility(View.GONE);
         mDescriptionHeader.setVisibility(View.GONE);
         mSpinnerStatus.setVisibility(View.GONE);
         mViewStatus.setVisibility(View.VISIBLE);
-
-        mImageView.setOnClickListener(null); // disable edit mode button
-
-        mMode = EDIT_MODE_DISABLED;
-
         mFab.show();
 
-        mInitialEntry.setTitle(mEditTitle.getText().toString());
-        mInitialEntry.setDescription(mEditDescription.getText().toString());
-        // status does not need to be set as it is set every time the spinner is changed
-        mInitialEntry.setCreator(mEditCreator.getText().toString());
-        mInitialEntry.setDateCreated(mEditDateCreated.getText().toString());
-        // mInitialEntry.setTimeStamp(Utility.getCurrentTimestamp()); // not sure if this should be changed every time
-        mInitialEntry.setImageLocation(mImageLocation);
-        Toast.makeText(this, "image location = " + mImageLocation, Toast.LENGTH_SHORT).show();
+        mMode = EDIT_MODE_DISABLED;
+        disableContentInteraction();
 
-        saveChanges();
+        mEntry.setTitle(mEditTitle.getText().toString());                                           // set variables in edittexts in local entry variable
+        mEntry.setDescription(mEditDescription.getText().toString());
+        mEntry.setCreator(mEditCreator.getText().toString());
+        mEntry.setDateCreated(mEditDateCreated.getText().toString());
+        mEntry.setImageLocation(mImageLocation);
+
+        saveChanges();                                                                              // save local entry variable to database
     }
 
     private void disableContentInteraction() {
-        disableEditText(mEditTitle);
-        disableEditText(mEditDescription);
-        disableEditText(mEditCreator);
-        disableEditText(mEditDateCreated);
-    }
+        EditText views[] = {mEditTitle, mEditDescription, mEditCreator, mEditDateCreated};
+        for (int i = 0; i < views.length; i++) {                                                    // step through edittexts, enabling each one
+            views[i].setKeyListener(null);
+            views[i].setFocusable(false);
+            views[i].setFocusableInTouchMode(false);
+            views[i].setCursorVisible(false);
+            views[i].clearFocus();
+        }
 
-    private void disableEditText(EditText v) {
-        v.setKeyListener(null);
-        v.setFocusable(false);
-        v.setFocusableInTouchMode(false);
-        v.setCursorVisible(false);
-        v.clearFocus();
+        mImageView.setOnClickListener(this);                                                        // enable imageview interaction
     }
 
     private void enableContentInteraction() {
-        enableEditText(mEditTitle);
-        enableEditText(mEditDescription);
-        enableEditText(mEditCreator);
-        enableEditText(mEditDateCreated);
+        EditText views[] = {mEditTitle, mEditDescription, mEditCreator, mEditDateCreated};          // step through edittexts, disabling each one
+        for (int i = 0; i < views.length; i++) {
+            views[i].setKeyListener(new EditText(this).getKeyListener());
+            views[i].setFocusable(true);
+            views[i].setFocusableInTouchMode(true);
+            views[i].setCursorVisible(true);
+        }
+
+        mImageView.setOnClickListener(null);                                                        // disable imageview interaction
     }
 
-    private void enableEditText(EditText v) {
-        v.setKeyListener(new EditText(this).getKeyListener());
-        v.setFocusable(true);
-        v.setFocusableInTouchMode(true);
-        v.setCursorVisible(true);
-    }
-
+    /** disable software keyboard **/
     private void hideSoftKeyboard() {
-        InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager)
+                this.getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = this.getCurrentFocus();
         if (view == null) {
             view = new View(this);
@@ -248,137 +233,129 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    /** read existing entry in to local variables **/
     private void readContent() {
-        mTitle = mInitialEntry.getTitle();
-        mDescription = mInitialEntry.getDescription();
-        mStatus = MediaEntry.getStringStatus(mInitialEntry.getStatus());
-        mStatusInt = mInitialEntry.getStatus();
-        mCreator = mInitialEntry.getCreator();
-        mDateCreated = mInitialEntry.getDateCreated();
-        mImageRes = mInitialEntry.getImage();
-        mImageLocation = mInitialEntry.getImageLocation();
+        mTitle = mEntry.getTitle();                                                                 // read content from passed entry into local variables
+        mDescription = mEntry.getDescription();
+        mStatus = MediaEntry.getStringStatus(mEntry.getStatus());
+        mStatusInt = mEntry.getStatus();
+        mCreator = mEntry.getCreator();
+        mDateCreated = mEntry.getDateCreated();
+        mImageLocation = mEntry.getImageLocation();
 
         fillViews();
     }
 
+    /** create default values for a new entry **/
     private void initialiseContent() {
-        mTitle = "New Entry";
+        mTitle = "New Entry";                                                                       // create default variables
         mDescription = "Describe the entry here.";
         mStatusInt = 0;
         mStatus = MediaEntry.getStringStatus(mStatusInt);
-//        creator = "Creator";
-//        dateCreated = "01 Jan 1970";
-        mImageRes = R.drawable.placeholder_image; // temporary image
+        mImageLocation = null;                                                                      // does not need to be set as fillviews can handle empty image location
 
-        mInitialEntry = new MediaEntry();
-        mInitialEntry.setTitle("New Entry");
+        mEntry = new MediaEntry();
+        mEntry.setTitle("New Entry");
 
         fillViews();
     }
 
+    /** fill views according to local variables and assign image according **/
     private void fillViews() {
-        mEditTitle.setText(mTitle);
+        mEditTitle.setText(mTitle);                                                                 // fill views with appropriate local variables
         mEditDescription.setText(mDescription);
         mViewStatus.setText(mStatus);
         mEditCreator.setText(mCreator);
         mEditDateCreated.setText(mDateCreated);
         mViewStatus.setTextColor(getResources().getColor(MediaEntry.getStatusColor(mStatusInt)));
 
-        // check if image file and imagelocation is valid, if not, display default image
-        if(Utility.isValidImageLocation(mImageLocation)){
+        if(Utility.isValidImageLocation(mImageLocation)){                                           // check if image file and imagelocation is valid, if not, display default image
             Glide.with(this).load(Uri.fromFile(new File(mImageLocation))).into(mImageView);
         } else {
             mImageView.setImageResource(R.drawable.placeholder_image);
         }
     }
 
-    private void displayEditTextUnderline() {
-        mEditTitle.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-        mEditDescription.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-        mViewStatus.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-        mEditCreator.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-        mEditDateCreated.setBackgroundTintList(getColorStateList(R.color.grey_underline));
-    }
-
-    private void hideEditTextUnderline() {
-        mEditTitle.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-        mEditDescription.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-        mViewStatus.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-        mEditCreator.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-        mEditDateCreated.setBackgroundTintList(getColorStateList(R.color.transparent_underline));
-    }
-
+    /** override clicks to certain views **/
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.content_fab:
+            case R.id.content_fab:                                                                  // when fab is pressed, enter edit mode
                 enableEditMode();
                 break;
-            case R.id.view_check_button:
+            case R.id.view_check_button:                                                            // when checkmark is pressed, leave editmode, hide keyboard
                 disableEditMode();
                 hideSoftKeyboard();
                 break;
-            case R.id.view_back_button:
+            case R.id.view_back_button:                                                             // when back button is pressed, return to main activity
                 finish();
                 break;
-            case R.id.view_image:
+            case R.id.view_image:                                                                   // when image is pressed, redirect to gallery picker
                 pickImage();
                 break;
         }
     }
 
+    /** override back button behaviour if the activity is in edit mode **/
     @Override
     public void onBackPressed() {
-        if (mMode == EDIT_MODE_ENABLED) {
+        if (mMode == EDIT_MODE_ENABLED) {                                                           // if activity is in edit mode, make back return you to view mode
             onClick(mCheckView);
         } else {
             super.onBackPressed();
         }
     }
 
+    /* methods for handling changes in state (rotating screen, etc) */
+    /** save state before change **/
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState, @NonNull PersistableBundle outPersistentState) {
+    public void onSaveInstanceState(@NonNull Bundle outState,
+                                    @NonNull PersistableBundle outPersistentState) {
         super.onSaveInstanceState(outState, outPersistentState);
-        outState.putInt("mode", mMode);
+        outState.putInt("mode", mMode);                                                             // save state to outstate bundle
     }
 
+    /** restore state after change **/
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        mMode = savedInstanceState.getInt("mode");
+        mMode = savedInstanceState.getInt("mode");                                              // restore state from bundle
         if (mMode == EDIT_MODE_ENABLED) {
             enableEditMode();
         }
     }
 
-    // methods for handling spinner
+    /* spinner handling overrides */
+    /** update status variable when a spinner option is selected **/
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        mStatusInt = position;
+        mStatusInt = position;                                                                      // update local variables
         mStatus = MediaEntry.getStringStatus(position);
-        mInitialEntry.setStatus(position);
-        mViewStatus.setText(mStatus);
+        mEntry.setStatus(position);                                                                 // update local entry
+        mViewStatus.setText(mStatus);                                                               // update view contents and color
         mViewStatus.setTextColor(getResources().getColor(MediaEntry.getStatusColor(mStatusInt)));
-        Log.d(TAG, "onItemSelected: changed color to " + MediaEntry.getStatusColor(mStatusInt));
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
-    // methods for handling image input
+    /* image file handling functions */
+    /** redirect the user to the gallery picker **/
     private void pickImage() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//        startActivity(intent);
-        //        intent.setType("image/*");
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(intent, PICK_IMAGE);
     }
 
+    /** get permission to access device storage **/
     private void requestStoragePermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED
+                && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE)
+                == PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
@@ -389,52 +366,54 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    // onActivityResult
-        // check activities of type PICK_IMAGE
-        // check there is data attached
-        // try/catch for filenotfoundexception
-            // assign data from return to a uri
-            // use bitmapfactory to get a bitmap from the uri
-            // get the path for said uri
-        // (for now) update image view with new image
-
-
+    /** handle result of gallery picker intent from pickimage() **/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE && resultCode == Activity.RESULT_OK) {
             if (data == null) {
-                Toast.makeText(this, "no image returned", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "no image returned", Toast.LENGTH_SHORT).show();   // do nothing if no image was selected
                 return;
             }
             try {
                 mSelectedImage = data.getData();
                 if (mSelectedImage != null && getContentResolver() != null){
-                    mBitmap = BitmapFactory.decodeStream(getContentResolver().openInputStream(mSelectedImage));
-                    String path = getPath(mSelectedImage);
+                    mBitmap = BitmapFactory.decodeStream(getContentResolver().
+                            openInputStream(mSelectedImage));
+                    String path = getPath(mSelectedImage);                                          // get image path
                     if (path != null){
-                        Glide.with(DetailsActivity.this).asBitmap().load(mBitmap).into(mImageView);     // only using glide based on other code, either update the rest of the code
-                                                                                                               // to use glide, or change this to regular android commands
+                        Glide.with(DetailsActivity.this).asBitmap().                         // only using glide based on other code, either update the rest of the code
+                                load(mBitmap).into(mImageView);                                     // to use glide, or change this to regular android commands
+
                         mImageLocation = path;
-                        Toast.makeText(this, "image location = " + mImageLocation, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "image successfully imported",
+                                Toast.LENGTH_SHORT).show();
                     }
                 }
             } catch (FileNotFoundException e) {
-                Log.e(TAG, "onActivityResult: error updating image", e);
+                Log.e(TAG, "onActivityResult: error updating image", e);                        // send error if file not found
             }
         }
     }
 
-//     copied
+    /** get path of imported image **/
     private String getPath(Uri uri) {
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        Cursor cursor = getContentResolver().query(uri,
+                null,
+                null,
+                null,
+                null);
         if (cursor != null) {
             cursor.moveToFirst();
             String document_id = cursor.getString(0);
             document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
             cursor.close();
             cursor = getContentResolver().query(
-                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    null,
+                    MediaStore.Images.Media._ID + " = ? ",
+                    new String[]{document_id},
+                    null);
             if (cursor != null) {
                 cursor.moveToFirst();
                 String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));

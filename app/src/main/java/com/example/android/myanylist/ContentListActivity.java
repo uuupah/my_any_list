@@ -49,7 +49,7 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
     // ui components
     private RecyclerView mRecyclerView;
 
-    // vars (anything that isnt a view or a widget)
+    // vars
     private ArrayList<MediaEntry> mEntries = new ArrayList<>();
     private EntryRecyclerAdapter mEntryRecyclerAdapter;
     private EntryRepository mMediaEntryRepository;
@@ -59,24 +59,24 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content_list);
 
-        mRecyclerView = findViewById(R.id.content_recycler_view);       // attach the variable to its id
+        mRecyclerView = findViewById(R.id.content_recycler_view);                                   // attach the variable to its id
 
-        mMediaEntryRepository = new EntryRepository(this);
+        mMediaEntryRepository = new EntryRepository(this);                                  // create database repository
         initRecyclerView();
         retrieveEntries();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.content_list_toolbar);
+        Toolbar toolbar = findViewById(R.id.content_list_toolbar);                                  // set up toolbar
         setSupportActionBar(toolbar);
-        setTitle("Games");
+        setTitle("Entries");
         toolbar.setTitleTextColor(ContextCompat.getColor(this,android.R.color.white));
 
         findViewById(R.id.list_fab).setOnClickListener(this);
     }
 
-    private void retrieveEntries(){
-        // triggers when the observer is attached and on any subsequent changes to the repository
-        // this can be used for both initial startup and updating further changes to the databases
-        mMediaEntryRepository.retrieveEntryTask().observe(this, new Observer<List<MediaEntry>>() {
+    private void retrieveEntries(){                                                                 // triggers when the observer is attached and on any subsequent changes to the repository
+                                                                                                    // this can be used for both initial startup and updating further changes to the databases
+        mMediaEntryRepository.retrieveEntryTask().observe(this,
+                new Observer<List<MediaEntry>>() {
             @Override
             public void onChanged(List<MediaEntry> mediaEntries) {
                 if(mEntries.size() > 0) {
@@ -90,23 +90,19 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
         });
     }
 
-    private void insertFakeContent() {
-        mEntries.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.placeholder_image));
-        mEntries.add(new MediaEntry("Bloodborne", 10, "2 jan 2020", 1, "FromSoftware", "Bloodborne follows the player's character, a hunter, through the decrepit city of yharnam", R.drawable.bloodborne));
-        mEntries.add(new MediaEntry("Sekiro", 9, "3 jan 2020", 0, "FromSoftware", "Sekiro takes place in the sengoku period in japan, and follows a shinobi known as wolf as he attempts to take revenge on a samurai clan who attacked him and kidnapped his lord", R.drawable.sekiro));
-        mEntryRecyclerAdapter.notifyDataSetChanged();
-    }
-
+    /** start the recycler view **/
     private void initRecyclerView() {
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);            // set up the recycler as a linear list
         mRecyclerView.setLayoutManager(linearLayoutManager);
-        VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(16);
+        VerticalSpacingItemDecorator itemDecorator =                                                // set up spacing between list items
+                new VerticalSpacingItemDecorator(16);
         mRecyclerView.addItemDecoration(itemDecorator);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);           // allow touch inputs to recycler list
         mEntryRecyclerAdapter = new EntryRecyclerAdapter(mEntries, this);
         mRecyclerView.setAdapter(mEntryRecyclerAdapter);
     }
 
+    /** on recycler view click, create and execute intent to load that entry in the details activity **/
     @Override
     public void onContentClick(int position) {
         mEntries.get(position);
@@ -115,31 +111,44 @@ public class ContentListActivity extends AppCompatActivity implements EntryRecyc
         startActivity(intent);
     }
 
+    /** on click override **/
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.list_fab:
+            case R.id.list_fab:                                                                     // create new entry when floating action button is clicked
                 Intent intent = new Intent(this, DetailsActivity.class);
                 startActivity(intent);
                 break;
         }
     }
 
+    /** watch for swipe activity on recycler view **/
+    private ItemTouchHelper.SimpleCallback itemTouchHelperCallback =
+            new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView,                                   // dont allow moving of entries
+                              @NonNull RecyclerView.ViewHolder viewHolder,
+                              @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {          // delete entries swiped to the right
+            deleteEntry(mEntries.get(viewHolder.getAdapterPosition()));
+        }
+    };
+
+    /** remove entries from the database and update the recycler view **/
     private void deleteEntry(MediaEntry entry){
         mEntries.remove(entry);
         mEntryRecyclerAdapter.notifyDataSetChanged();
         mMediaEntryRepository.deleteEntry(entry);
     }
 
-    private ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-        @Override
-        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-            return false;
-        }
-
-        @Override
-        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-            deleteEntry(mEntries.get(viewHolder.getAdapterPosition()));
-        }
-    };  
+    private void insertFakeContent() {
+        mEntries.add(new MediaEntry("Dark Souls", 8, "1 jan 2020", 2, "FromSoftware", "Dark Souls takes place in the fictional kingdom of Lordran, where players assume the role of a cursed undedad who begins a pilgrimage to discover the fate of their kind", R.drawable.placeholder_image));
+        mEntries.add(new MediaEntry("Bloodborne", 10, "2 jan 2020", 1, "FromSoftware", "Bloodborne follows the player's character, a hunter, through the decrepit city of yharnam", R.drawable.bloodborne));
+        mEntries.add(new MediaEntry("Sekiro", 9, "3 jan 2020", 0, "FromSoftware", "Sekiro takes place in the sengoku period in japan, and follows a shinobi known as wolf as he attempts to take revenge on a samurai clan who attacked him and kidnapped his lord", R.drawable.sekiro));
+        mEntryRecyclerAdapter.notifyDataSetChanged();
+    }
 }
