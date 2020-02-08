@@ -21,8 +21,8 @@ import java.util.ArrayList;
 
 public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdapter.ViewHolder> {
 
-    private ArrayList<MediaEntry> mItems = new ArrayList<>();
     private OnContentListener mOnContentListener;
+    private ArrayList<MediaEntry> mItems;
 
     public EntryRecyclerAdapter(ArrayList<MediaEntry> items, OnContentListener onContentListener) {
         this.mItems = items;

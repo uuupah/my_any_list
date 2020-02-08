@@ -28,4 +28,5 @@ public abstract class MediaDatabase extends RoomDatabase {
     }
 
     public abstract EntryDao getEntryDao();
+      
 }

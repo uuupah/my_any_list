@@ -207,7 +207,7 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
             views[i].clearFocus();
         }
 
-        mImageView.setOnClickListener(this);                                                        // enable imageview interaction
+        mImageView.setOnClickListener(null);                                                        // enable imageview interaction
     }
 
     private void enableContentInteraction() {
@@ -219,7 +219,7 @@ public class DetailsActivity extends AppCompatActivity implements View.OnClickLi
             views[i].setCursorVisible(true);
         }
 
-        mImageView.setOnClickListener(null);                                                        // disable imageview interaction
+        mImageView.setOnClickListener(this);                                                        // disable imageview interaction
     }
 
     /** disable software keyboard **/

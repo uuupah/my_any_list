@@ -1,6 +1,6 @@
 //TODO
-// allow for modification of image
-// -> ensure that mImageRes is updated and then the image view is updated from that
+// fix weird behaviour of toolbar in edit mode
+// add modification icon on image
 // hide uneccesary (empty) titles and views
 // add extra variables that may be useful
 // add rating input (star rating?)
@@ -16,7 +16,7 @@
 // add back to top functionality with up arrow
 // add media type variable (i think thats what you have to do in sqlite i dont 100% remember and im sleepy)
 // implement itemtouchhelper.simplecallback onmove to allow rearranging of entries
-// add headers between
+// add headers between status types
 // clean up this fucking terrible mess of code
 // give consistent and easier to understand variable names
 
